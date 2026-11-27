@@ -818,18 +818,7 @@ button.brand:hover span { color: #fff; }
 .intro-access:active { transform: translateY(0) scale(0.98); }
 .intro-access .access-mark { color: #cccfd2; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .intro-access .access-arrow { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #8f9b9f; }
-.intro-note, .intro-footer { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; color: #72767d; }
-.intro-rail .intro-footer {
-  margin-top: auto;
-  align-self: center;
-  width: 100%;
-  padding: 0 6px 12px;
-  font-size: 8px;
-  line-height: 1.5;
-  letter-spacing: 0.12em;
-  text-align: center;
-  word-break: break-word;
-}
+.intro-note { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; color: #72767d; }
 
 @keyframes introGridDrift { to { background-position: 0 42px, 42px 0; } }
 @keyframes introSpin { to { transform: rotate(360deg); } }
