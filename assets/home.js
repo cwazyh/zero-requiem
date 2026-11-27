@@ -56,6 +56,8 @@ sidebar.querySelectorAll(".sidebar-nav a").forEach((link) => {
 });
 
 function applyProfile(me) {
+  window.ZR_PROFILE = me || null;
+  window.dispatchEvent(new CustomEvent("zr:profile", { detail: window.ZR_PROFILE }));
   if (!me || !me.authenticated) {
     lastVerifiedProfile = null;
     profileAvatar.src = "assets/logo.png";
