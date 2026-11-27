@@ -742,12 +742,12 @@ button.brand:hover span { color: #fff; }
 #intro .intro-glass { --ag-tint: rgba(8, 9, 10, 0.44); --ag-radius: 28px; }
 .intro-ring.two { inset: 12px; border-color: rgba(204, 207, 210, 0.5); border-top-color: transparent; animation: introSpin 7s linear infinite reverse; }
 .intro-ring.three { inset: 26px; border-color: rgba(204, 207, 210, 0.12); animation: introPulse 2.4s ease-in-out infinite; }
-.intro-logo { width: 58px; height: 58px; object-fit: contain; animation: introImageGlitch 9s steps(1) infinite; }
-.intro-rail img { animation: introImageGlitch 11s steps(1) infinite reverse; }
+.intro-logo { width: 58px; height: 58px; object-fit: contain; animation: introImageGlitch 9.4s steps(1) -2.8s infinite; }
+.intro-rail img { animation: introImageGlitch 11.6s steps(1) -5.3s infinite reverse; }
 .intro-scan { position: absolute; left: 8px; right: 8px; height: 2px; top: 8px; background: linear-gradient(90deg, transparent, #cccfd2, transparent); opacity: 0.6; animation: introScan 2.6s ease-in-out infinite; }
 .intro [data-text] {
   position: relative;
-  animation: introTextJitter 8s steps(1) infinite;
+  animation: introTextJitter var(--jitter-duration, 8s) steps(1) var(--jitter-delay, 0s) infinite;
 }
 .intro [data-text]::before,
 .intro [data-text]::after {
@@ -766,22 +766,33 @@ button.brand:hover span { color: #fff; }
 .intro [data-text]::before {
   color: #cccfd2;
   text-shadow: -1px 0 #2c393d, 1px 0 #cccfd2;
-  animation: introGlitchA 8s steps(1) infinite reverse;
+  animation: introGlitchA var(--glitch-a-duration, 8s) steps(1) var(--glitch-a-delay, 0s) infinite reverse;
 }
 .intro [data-text]::after {
   color: #8f9b9f;
   text-shadow: 1px 0 #2c393d, -1px 0 #cccfd2;
-  animation: introGlitchB 11s steps(1) infinite reverse;
+  animation: introGlitchB var(--glitch-b-duration, 11s) steps(1) var(--glitch-b-delay, 0s) infinite reverse;
 }
 .rail-glyph[data-text]::before,
 .rail-glyph[data-text]::after { display: grid; place-items: center; }
-.intro-kicker { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; letter-spacing: 0.42em; color: #8f9b9f; text-transform: uppercase; }
+.intro-rail .rail-glyph:nth-child(2) { --jitter-duration: 8.4s; --jitter-delay: -0.8s; --glitch-a-duration: 10.2s; --glitch-a-delay: -3.7s; --glitch-b-duration: 12.2s; --glitch-b-delay: -6.5s; }
+.intro-rail .rail-glyph:nth-child(3) { --jitter-duration: 9.7s; --jitter-delay: -4.1s; --glitch-a-duration: 8.6s; --glitch-a-delay: -1.9s; --glitch-b-duration: 11.3s; --glitch-b-delay: -8.2s; }
+.intro-rail .rail-glyph:nth-child(4) { --jitter-duration: 7.9s; --jitter-delay: -2.5s; --glitch-a-duration: 11.8s; --glitch-a-delay: -7.6s; --glitch-b-duration: 9.1s; --glitch-b-delay: -3.4s; }
+.intro-rail .rail-glyph:nth-child(5) { --jitter-duration: 10.6s; --jitter-delay: -6.3s; --glitch-a-duration: 9.3s; --glitch-a-delay: -5.1s; --glitch-b-duration: 13.2s; --glitch-b-delay: -1.7s; }
+.intro-rail .rail-glyph:nth-child(6) { --jitter-duration: 8.8s; --jitter-delay: -7.1s; --glitch-a-duration: 12.4s; --glitch-a-delay: -2.8s; --glitch-b-duration: 10.5s; --glitch-b-delay: -4.9s; }
+.intro-kicker { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; letter-spacing: 0.42em; color: #8f9b9f; text-transform: uppercase; --jitter-duration: 7.6s; --jitter-delay: -1.3s; --glitch-a-duration: 9.2s; --glitch-a-delay: -4.7s; --glitch-b-duration: 12.4s; --glitch-b-delay: -2.1s; }
 .intro-title {
   margin: 0;
   font-size: clamp(28px, 5vw, 52px);
   font-weight: 650;
   letter-spacing: -0.04em;
   color: #f2f3f5;
+  --jitter-duration: 8.9s;
+  --jitter-delay: -5.2s;
+  --glitch-a-duration: 10.7s;
+  --glitch-a-delay: -1.8s;
+  --glitch-b-duration: 13.1s;
+  --glitch-b-delay: -7.4s;
 }
 .intro-status {
   margin: 0;
@@ -789,6 +800,12 @@ button.brand:hover span { color: #fff; }
   font-size: 11px;
   letter-spacing: 0.18em;
   color: #8f9b9f;
+  --jitter-duration: 7.2s;
+  --jitter-delay: -3.4s;
+  --glitch-a-duration: 11.9s;
+  --glitch-a-delay: -6.1s;
+  --glitch-b-duration: 9.8s;
+  --glitch-b-delay: -0.9s;
 }
 .intro-progress { width: min(340px, 70vw); height: 2px; border-radius: 2px; background: rgba(204, 207, 210, 0.14); overflow: hidden; }
 .intro-progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #08090a, #4c595d, #cccfd2); }
@@ -812,13 +829,19 @@ button.brand:hover span { color: #fff; }
   transform: translateY(10px);
   pointer-events: none;
   transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease, border-color 0.2s ease;
+  --jitter-duration: 10.3s;
+  --jitter-delay: -2.6s;
+  --glitch-a-duration: 8.1s;
+  --glitch-a-delay: -8.3s;
+  --glitch-b-duration: 12.7s;
+  --glitch-b-delay: -4.1s;
 }
 .intro.ready .intro-access { opacity: 1; transform: none; pointer-events: auto; }
 .intro-access:hover { background: #2c393d; border-color: #cccfd2; transform: translateY(-2px); }
 .intro-access:active { transform: translateY(0) scale(0.98); }
 .intro-access .access-mark { color: #cccfd2; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .intro-access .access-arrow { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #8f9b9f; }
-.intro-note { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; color: #72767d; }
+.intro-note { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; color: #72767d; --jitter-duration: 11.4s; --jitter-delay: -6.7s; --glitch-a-duration: 9.5s; --glitch-a-delay: -1.4s; --glitch-b-duration: 10.9s; --glitch-b-delay: -5.8s; }
 
 @keyframes introGridDrift { to { background-position: 0 42px, 42px 0; } }
 @keyframes introSpin { to { transform: rotate(360deg); } }
