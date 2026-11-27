@@ -285,6 +285,26 @@ function coverSource(track) {
   return track.cover ? `${AUDIO_BASE}covers/${track.cover}` : placeholderCover(track);
 }
 
+function createDragGhost(track) {
+  const ghost = document.createElement("div");
+  ghost.className = "mp-queue-drag-ghost";
+
+  const image = document.createElement("img");
+  image.src = coverSource(track);
+  image.alt = "";
+
+  const copy = document.createElement("span");
+  const name = document.createElement("strong");
+  name.textContent = track.title;
+  const artist = document.createElement("span");
+  artist.textContent = track.artist;
+  copy.append(name, artist);
+
+  ghost.append(image, copy);
+  document.body.appendChild(ghost);
+  return ghost;
+}
+
 function setIcon(button, icon, label) {
   if (!button) return;
   button.innerHTML = ICONS[icon];
@@ -511,6 +531,7 @@ function clearDropMarks() {
 }
 
 function clearDragMarks() {
+  document.querySelectorAll(".mp-queue-drag-ghost").forEach((ghost) => ghost.remove());
   if (!queueList) return;
   queueList.classList.remove("dragging");
   queueList.querySelectorAll(".mp-queue-row").forEach((row) => row.classList.remove("dragging", "drop-before", "drop-after"));
@@ -620,13 +641,8 @@ function buildQueueList() {
       row.classList.add("dragging");
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", String(index));
-      const ghost = row.cloneNode(true);
-      ghost.style.position = "fixed";
-      ghost.style.top = "-1000px";
-      ghost.style.left = "-1000px";
-      ghost.style.width = `${row.offsetWidth}px`;
-      document.body.appendChild(ghost);
-      event.dataTransfer.setDragImage(ghost, 24, 24);
+      const ghost = createDragGhost(track);
+      event.dataTransfer.setDragImage(ghost, 22, 23);
       window.setTimeout(() => ghost.remove(), 0);
     });
     grip.addEventListener("dragend", () => {
@@ -655,6 +671,9 @@ function buildQueueList() {
       if (!queueDragging) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
+      const listRect = queueList.getBoundingClientRect();
+      if (event.clientY < listRect.top + 32) queueList.scrollTop -= 12;
+      else if (event.clientY > listRect.bottom - 32) queueList.scrollTop += 12;
       const rect = row.getBoundingClientRect();
       const before = event.clientY < rect.top + rect.height / 2;
       clearDropMarks();
@@ -835,6 +854,12 @@ if (queueList) {
     clearDropMarks();
     const last = queueList.querySelector(".mp-queue-row:last-child");
     if (last) last.classList.add("drop-after");
+  });
+  queueList.addEventListener("dragleave", (event) => {
+    const rect = queueList.getBoundingClientRect();
+    if (event.clientX <= rect.left || event.clientX >= rect.right || event.clientY <= rect.top || event.clientY >= rect.bottom) {
+      clearDropMarks();
+    }
   });
   queueList.addEventListener("drop", (event) => {
     if (event.target !== queueList || draggedIndex === null) return;
