@@ -10,8 +10,8 @@
   <link rel="canonical" href="https://cwazyh.github.io/zero-requiem/mod.html">
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/mod.html">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style.css?v=32">
-  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=32">
+  <link rel="stylesheet" href="assets/style.css?v=33">
+  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=33">
 </head>
 <body>
   <header class="topbar">
@@ -109,12 +109,11 @@
       </div>
     </div>
     <div class="mp-tools">
-      <button id="mp-shuffle" type="button" aria-label="Shuffle off"></button>
-      <button id="mp-repeat" type="button" aria-label="Repeat off"></button>
-      <button id="mp-speed" type="button" aria-label="Playback speed 1x" title="Playback speed: 1x"></button>
+      <button id="mp-queue" type="button" aria-label="Open queue" aria-expanded="false"></button>
+      <button id="mp-mode" type="button" aria-label="Random soundtrack" aria-pressed="true" title="Random soundtrack"></button>
       <div class="mp-volume-wrap">
         <button id="mp-volume" class="mp-volume-toggle" type="button" aria-label="Volume" aria-expanded="false"></button>
-        <div class="mp-volume-popup" id="mp-volume-popup" hidden>
+        <div class="mp-volume-popup" id="mp-volume-popup" aria-hidden="true">
           <span id="mp-volume-percent">80%</span>
           <div class="mp-volume-track" id="mp-volume-track" role="slider" aria-label="Volume" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" tabindex="0">
             <div class="mp-volume-fill" id="mp-volume-fill"></div>
@@ -122,18 +121,19 @@
           <button id="mp-popup-mute" type="button" aria-label="Mute"></button>
         </div>
       </div>
-      <button id="mp-open" type="button" aria-label="Open player"></button>
-      <span class="mp-divider" aria-hidden="true"></span>
-      <button id="mp-queue" type="button" aria-label="Queue"></button>
+      <div class="mp-queue-popup" id="mp-queue-popup" aria-hidden="true">
+        <div class="mp-queue-head"><strong>Queue</strong><span id="mp-queue-count">0 tracks</span></div>
+        <div class="mp-queue-list" id="mp-queue-list"></div>
+      </div>
       <button id="mp-unmute" class="mp-unmute" type="button">Enable sound</button>
     </div>
-    <audio id="mp-audio" preload="metadata" muted autoplay playsinline></audio>
+    <audio id="mp-audio" preload="auto" autoplay playsinline></audio>
   </ag-glass>
 
-  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=32"></script>
-  <script src="assets/config.js?v=32"></script>
-  <script src="assets/panel.js?v=32"></script>
-  <script src="assets/profile.js?v=32"></script>
-  <script src="assets/music.js?v=32"></script>
+  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=33"></script>
+  <script src="assets/config.js?v=33"></script>
+  <script src="assets/panel.js?v=33"></script>
+  <script src="assets/profile.js?v=33"></script>
+  <script src="assets/music.js?v=33"></script>
 </body>
 </html>
