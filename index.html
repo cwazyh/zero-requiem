@@ -11,7 +11,8 @@
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/">
   <meta name="description" content="Zero://Requiem — a private Discord community with Arthur, its moderation and support bot.">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style.css?v=29">
+  <link rel="stylesheet" href="assets/style.css?v=30">
+  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=30">
 </head>
 <body>
   <header class="topbar">
@@ -179,7 +180,7 @@
     <span>Zero://Requiem • Web Portal</span>
   </footer>
 
-  <div class="music-player" id="music-player">
+  <ag-glass class="music-player" id="music-player" variant="clear" tone="dark" params='{"dispersion":0.18,"bezel":0.55,"rim":0.35,"blur":14}'>
     <div class="mp-track">
       <img id="mp-cover" src="assets/logo.png" alt="">
       <div class="mp-meta"><strong id="mp-title">COLORS</strong><span id="mp-artist">FLOW</span></div>
@@ -217,11 +218,12 @@
       <button id="mp-unmute" class="mp-unmute" type="button">Enable sound</button>
     </div>
     <audio id="mp-audio" preload="metadata" muted autoplay playsinline></audio>
-  </div>
+  </ag-glass>
 
-  <script src="assets/config.js?v=29"></script>
-  <script src="assets/home.js?v=29"></script>
-  <script src="assets/profile.js?v=29"></script>
-  <script src="assets/music.js?v=29"></script>
+  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=30"></script>
+  <script src="assets/config.js?v=30"></script>
+  <script src="assets/home.js?v=30"></script>
+  <script src="assets/profile.js?v=30"></script>
+  <script src="assets/music.js?v=30"></script>
 </body>
 </html>
