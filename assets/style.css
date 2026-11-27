@@ -377,6 +377,8 @@ button.brand:hover span { color: #fff; }
   --mp-accent-end: rgb(20, 22, 22);
   --mp-accent-solid: #3a4145;
   --mp-progress-scale: 0;
+  --art-span: 64px;
+  --art-bar-height: 64px;
   --queue-cover: none;
   position: fixed;
   left: 12px;
@@ -394,35 +396,43 @@ button.brand:hover span { color: #fff; }
   --ag-tint: rgba(12, 14, 16, 0.34);
   --ag-radius: 32px;
 }
-.mp-progress-layer {
+.mp-art-stage {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 0;
+  height: var(--art-span);
   pointer-events: none;
   border-radius: var(--ag-radius);
   overflow: hidden;
   background-color: rgb(8, 9, 11);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  filter: blur(44px) saturate(190%);
+  transform: translateZ(0);
   isolation: isolate;
-  clip-path: inset(0 calc((1 - var(--mp-progress-scale)) * 100%) 0 0);
-  transition: clip-path 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-mask-image: linear-gradient(90deg, #000 0 calc(var(--mp-progress-scale) * 100%), transparent calc(var(--mp-progress-scale) * 100%) 100%), linear-gradient(#000, #000);
+  mask-image: linear-gradient(90deg, #000 0 calc(var(--mp-progress-scale) * 100%), transparent calc(var(--mp-progress-scale) * 100%) 100%), linear-gradient(#000, #000);
+  -webkit-mask-size: 100% var(--art-bar-height), 100% calc(100% - var(--art-bar-height));
+  mask-size: 100% var(--art-bar-height), 100% calc(100% - var(--art-bar-height));
+  -webkit-mask-position: bottom, top;
+  mask-position: bottom, top;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.mp-progress-layer::before {
+.mp-art-stage::before {
   content: "";
   position: absolute;
   inset: -24px;
   background-color: rgb(8, 9, 11);
   background-image: var(--queue-cover);
-  background-size: 200% 100%;
+  background-size: cover;
   background-position: calc(var(--mp-progress-scale) * 100%) center;
-  filter: blur(44px) saturate(190%);
-  opacity: 1;
   transform: scale(1.1);
-  transition: background-position 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+#music-player.art-expanded .mp-art-stage { border-radius: 16px 16px var(--ag-radius) var(--ag-radius); }
 .music-player > * { position: relative; z-index: 1; }
-#music-player > .mp-progress-layer { position: absolute; z-index: 0; }
+#music-player > .mp-art-stage { position: absolute; z-index: 0; }
 .music-player > .mp-track, .music-player > .mp-tools, .music-player > .mp-queue-popup { z-index: 3; }
 .music-player button {
   appearance: none;
@@ -546,8 +556,9 @@ button.brand:hover span { color: #fff; }
   border-radius: 16px 16px 0 0;
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-bottom: 0;
-  background: rgba(10, 11, 13, 0.58);
-  backdrop-filter: blur(26px) saturate(150%);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   isolation: isolate;
   color: #dbdee1;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.66);
@@ -561,25 +572,6 @@ button.brand:hover span { color: #fff; }
   pointer-events: none;
 }
 .mp-queue-popup.open { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
-.mp-queue-popup::before,
-.mp-queue-popup::after { content: ""; position: absolute; pointer-events: none; }
-.mp-queue-popup::before {
-  inset: -24px;
-  z-index: 0;
-  background-image: var(--queue-cover);
-  background-size: cover;
-  background-position: center;
-  filter: blur(48px) saturate(180%) brightness(0.58);
-  opacity: 0.9;
-  transform: scale(1.1);
-}
-.mp-queue-popup::after {
-  inset: 0;
-  z-index: 0;
-  background: linear-gradient(145deg, var(--mp-accent-start), var(--mp-accent-mid) 48%, var(--mp-accent-end));
-  opacity: 0.38;
-  mix-blend-mode: soft-light;
-}
 .mp-queue-head, .mp-queue-list { position: relative; z-index: 1; }
 .mp-queue-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
 .mp-queue-head strong { font-size: 14px; font-weight: 650; letter-spacing: 0.01em; }
@@ -933,7 +925,7 @@ button.brand:hover span { color: #fff; }
   .track-row, .mp-controls button, .mp-tools button, .mp-like, .mp-volume-fill,
   .mp-volume-popup, .mp-queue-popup, .mp-queue-row, .user-popout, .popout-actions button { transform: none; transition: none; }
   .mp-queue-popup.open .mp-queue-row, .mp-queue-now i { animation: none; }
-  .mp-progress-layer, .mp-progress-layer::before { transition: none; }
+  .mp-art-stage { transition: none; }
   .intro::before, .intro-ring, .intro-rail img, .intro-logo, .intro-scan,
   .intro [data-text], .intro [data-text]::before, .intro [data-text]::after,
   .intro-progress span { animation: none; }
