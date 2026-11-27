@@ -691,7 +691,9 @@ button.brand:hover span { color: #fff; }
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  padding: 20px 0;
+  height: 100%;
+  min-height: 100dvh;
+  padding: 20px 0 14px;
   border-right: 1px solid rgba(204, 207, 210, 0.08);
   background: rgba(10, 12, 13, 0.72);
 }
@@ -740,12 +742,12 @@ button.brand:hover span { color: #fff; }
 #intro .intro-glass { --ag-tint: rgba(8, 9, 10, 0.44); --ag-radius: 28px; }
 .intro-ring.two { inset: 12px; border-color: rgba(204, 207, 210, 0.5); border-top-color: transparent; animation: introSpin 7s linear infinite reverse; }
 .intro-ring.three { inset: 26px; border-color: rgba(204, 207, 210, 0.12); animation: introPulse 2.4s ease-in-out infinite; }
-.intro-logo { width: 58px; height: 58px; object-fit: contain; animation: introImageGlitch 1.8s steps(1) infinite; }
-.intro-rail img { animation: introImageGlitch 1.6s steps(1) infinite reverse; }
+.intro-logo { width: 58px; height: 58px; object-fit: contain; animation: introImageGlitch 9s steps(1) infinite; }
+.intro-rail img { animation: introImageGlitch 11s steps(1) infinite reverse; }
 .intro-scan { position: absolute; left: 8px; right: 8px; height: 2px; top: 8px; background: linear-gradient(90deg, transparent, #cccfd2, transparent); opacity: 0.6; animation: introScan 2.6s ease-in-out infinite; }
 .intro [data-text] {
   position: relative;
-  animation: introTextJitter 2s steps(1) infinite;
+  animation: introTextJitter 8s steps(1) infinite;
 }
 .intro [data-text]::before,
 .intro [data-text]::after {
@@ -759,17 +761,17 @@ button.brand:hover span { color: #fff; }
   background: #08090a;
   text-align: inherit;
   pointer-events: none;
-  opacity: 0.95;
+  opacity: 0;
 }
 .intro [data-text]::before {
   color: #cccfd2;
-  text-shadow: -2px 0 #2c393d, 2px 0 #cccfd2;
-  animation: introGlitchA 1.4s steps(1) infinite reverse;
+  text-shadow: -1px 0 #2c393d, 1px 0 #cccfd2;
+  animation: introGlitchA 8s steps(1) infinite reverse;
 }
 .intro [data-text]::after {
   color: #8f9b9f;
-  text-shadow: 2px 0 #2c393d, -2px 0 #cccfd2;
-  animation: introGlitchB 1.7s steps(1) infinite reverse;
+  text-shadow: 1px 0 #2c393d, -1px 0 #cccfd2;
+  animation: introGlitchB 11s steps(1) infinite reverse;
 }
 .rail-glyph[data-text]::before,
 .rail-glyph[data-text]::after { display: grid; place-items: center; }
@@ -817,7 +819,17 @@ button.brand:hover span { color: #fff; }
 .intro-access .access-mark { color: #cccfd2; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .intro-access .access-arrow { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #8f9b9f; }
 .intro-note, .intro-footer { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; letter-spacing: 0.16em; color: #72767d; }
-.intro-footer { position: absolute; bottom: 18px; left: 94px; }
+.intro-rail .intro-footer {
+  margin-top: auto;
+  align-self: center;
+  width: 100%;
+  padding: 0 6px 12px;
+  font-size: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-align: center;
+  word-break: break-word;
+}
 
 @keyframes introGridDrift { to { background-position: 0 42px, 42px 0; } }
 @keyframes introSpin { to { transform: rotate(360deg); } }
@@ -825,104 +837,36 @@ button.brand:hover span { color: #fff; }
 @keyframes introScan { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(112px); } }
 @keyframes introProgress { to { width: 100%; } }
 @keyframes introImageGlitch {
-  0%, 100% { clip-path: inset(0); filter: drop-shadow(2px 0 rgba(204, 207, 210, 0.55)) drop-shadow(-2px 0 rgba(44, 57, 61, 0.8)); transform: translate(0); }
-  8% { clip-path: inset(14% 0 56% 0); filter: drop-shadow(-3px 0 rgba(204, 207, 210, 0.8)) drop-shadow(2px 0 rgba(44, 57, 61, 0.9)); transform: translate(-2px, 1px); }
-  16% { clip-path: inset(62% 0 10% 0); transform: translate(2px, -1px); }
-  24% { clip-path: inset(30% 0 42% 0); transform: translate(0); }
-  32% { clip-path: inset(78% 0 4% 0); filter: drop-shadow(3px 0 rgba(204, 207, 210, 0.7)) drop-shadow(-2px 0 rgba(44, 57, 61, 0.8)); transform: translate(1px, 1px); }
-  40% { clip-path: inset(8% 0 70% 0); transform: translate(-1px, 0); }
-  48% { clip-path: inset(48% 0 26% 0); transform: translate(2px, -1px); }
-  56% { clip-path: inset(20% 0 58% 0); filter: drop-shadow(-2px 0 rgba(204, 207, 210, 0.75)) drop-shadow(3px 0 rgba(44, 57, 61, 0.9)); transform: translate(0); }
-  64% { clip-path: inset(70% 0 12% 0); transform: translate(-2px, 1px); }
-  72% { clip-path: inset(4% 0 82% 0); transform: translate(1px, 0); }
-  80% { clip-path: inset(38% 0 36% 0); filter: drop-shadow(2px 0 rgba(204, 207, 210, 0.6)) drop-shadow(-3px 0 rgba(44, 57, 61, 0.85)); transform: translate(-1px, -1px); }
-  88% { clip-path: inset(56% 0 18% 0); transform: translate(2px, 1px); }
-  94% { clip-path: inset(24% 0 54% 0); transform: translate(0); }
+  0%, 60%, 66%, 76%, 82%, 90%, 94%, 100% { clip-path: inset(0); filter: none; transform: none; }
+  62% { clip-path: inset(12% 0 62% 0); filter: drop-shadow(1px 0 rgba(204, 207, 210, 0.4)); transform: translate(-1px, 0); }
+  64% { clip-path: inset(58% 0 16% 0); filter: drop-shadow(-1px 0 rgba(44, 57, 61, 0.5)); transform: translate(1px, 0); }
+  78% { clip-path: inset(30% 0 44% 0); filter: drop-shadow(1px 0 rgba(204, 207, 210, 0.35)); transform: translate(-1px, 0); }
+  80% { clip-path: inset(74% 0 6% 0); transform: translate(1px, 0); }
+  92% { clip-path: inset(20% 0 56% 0); filter: drop-shadow(-1px 0 rgba(44, 57, 61, 0.45)); transform: translate(-1px, 0); }
 }
 @keyframes introTextJitter {
-  0%, 7%, 14%, 21%, 28%, 35%, 42%, 49%, 56%, 63%, 70%, 77%, 84%, 91%, 100% { transform: none; }
-  8% { transform: translate(-3px, 1px) skewX(-4deg); }
-  15% { transform: translate(4px, -1px) skewX(3deg); }
-  22% { transform: translate(-2px, 0) scaleX(1.03); }
-  29% { transform: translate(3px, 1px) skewX(-3deg); }
-  36% { transform: translate(-4px, -1px) scaleX(0.98); }
-  43% { transform: translate(2px, 0) skewX(4deg); }
-  50% { transform: translate(-3px, 1px); }
-  57% { transform: translate(4px, -1px) scaleX(1.02); }
-  64% { transform: translate(-2px, 0) skewX(-3deg); }
-  71% { transform: translate(3px, 1px); }
-  78% { transform: translate(-4px, -1px) skewX(3deg); }
-  85% { transform: translate(2px, 0) scaleX(1.03); }
-  92% { transform: translate(-3px, 1px) skewX(-4deg); }
-}
-@keyframes introStatusGlitch {
-  0% { transform: none; clip-path: inset(8% 0 72% 0); }
-  5% { transform: translate(-3px, 0); clip-path: inset(62% 0 12% 0); }
-  10% { transform: translate(2px, 0); clip-path: inset(34% 0 46% 0); }
-  15% { transform: none; clip-path: inset(78% 0 4% 0); }
-  20% { transform: translate(-2px, 1px); clip-path: inset(18% 0 58% 0); }
-  25% { transform: translate(3px, -1px); clip-path: inset(52% 0 22% 0); }
-  30% { transform: none; clip-path: inset(2% 0 82% 0); }
-  35% { transform: translate(-3px, 0); clip-path: inset(68% 0 8% 0); }
-  40% { transform: translate(2px, 1px); clip-path: inset(26% 0 52% 0); }
-  45% { transform: none; clip-path: inset(84% 0 2% 0); }
-  50% { transform: translate(-2px, -1px); clip-path: inset(12% 0 66% 0); }
-  55% { transform: translate(3px, 0); clip-path: inset(58% 0 16% 0); }
-  60% { transform: none; clip-path: inset(38% 0 40% 0); }
-  65% { transform: translate(-3px, 1px); clip-path: inset(74% 0 6% 0); }
-  70% { transform: translate(2px, -1px); clip-path: inset(20% 0 60% 0); }
-  75% { transform: none; clip-path: inset(48% 0 28% 0); }
-  80% { transform: translate(-2px, 0); clip-path: inset(6% 0 78% 0); }
-  85% { transform: translate(3px, 1px); clip-path: inset(64% 0 10% 0); }
-  90% { transform: none; clip-path: inset(30% 0 50% 0); }
-  95% { transform: translate(-3px, -1px); clip-path: inset(80% 0 4% 0); }
-  100% { transform: none; clip-path: inset(8% 0 72% 0); }
+  0%, 60%, 66%, 76%, 82%, 90%, 94%, 100% { transform: none; }
+  62% { transform: translate(-1px, 0) skewX(-1deg); }
+  64% { transform: translate(1px, 0) skewX(1deg); }
+  78% { transform: translate(-1px, 0); }
+  80% { transform: translate(1px, 0) scaleX(1.01); }
+  92% { transform: translate(-1px, 0) skewX(1deg); }
 }
 @keyframes introGlitchA {
-  0% { transform: translate(-3px, 0); clip-path: inset(6% 0 76% 0); }
-  5% { transform: translate(4px, 1px); clip-path: inset(58% 0 14% 0); }
-  10% { transform: translate(-4px, -1px); clip-path: inset(28% 0 48% 0); }
-  15% { transform: translate(3px, 0); clip-path: inset(82% 0 4% 0); }
-  20% { transform: translate(-2px, 1px); clip-path: inset(14% 0 62% 0); }
-  25% { transform: translate(5px, -1px); clip-path: inset(48% 0 22% 0); }
-  30% { transform: translate(-3px, 0); clip-path: inset(2% 0 84% 0); }
-  35% { transform: translate(4px, 1px); clip-path: inset(66% 0 10% 0); }
-  40% { transform: translate(-4px, -1px); clip-path: inset(22% 0 56% 0); }
-  45% { transform: translate(3px, 0); clip-path: inset(88% 0 2% 0); }
-  50% { transform: translate(-2px, 1px); clip-path: inset(10% 0 70% 0); }
-  55% { transform: translate(5px, -1px); clip-path: inset(54% 0 16% 0); }
-  60% { transform: translate(-3px, 0); clip-path: inset(34% 0 42% 0); }
-  65% { transform: translate(4px, 1px); clip-path: inset(72% 0 8% 0); }
-  70% { transform: translate(-4px, -1px); clip-path: inset(18% 0 58% 0); }
-  75% { transform: translate(3px, 0); clip-path: inset(44% 0 30% 0); }
-  80% { transform: translate(-2px, 1px); clip-path: inset(4% 0 82% 0); }
-  85% { transform: translate(5px, -1px); clip-path: inset(62% 0 12% 0); }
-  90% { transform: translate(-3px, 0); clip-path: inset(26% 0 52% 0); }
-  95% { transform: translate(4px, 1px); clip-path: inset(78% 0 6% 0); }
-  100% { transform: translate(-3px, 0); clip-path: inset(6% 0 76% 0); }
+  0%, 60%, 66%, 76%, 82%, 90%, 94%, 100% { opacity: 0; clip-path: inset(100% 0 0 0); transform: none; }
+  62% { opacity: 0.8; clip-path: inset(10% 0 66% 0); transform: translate(-2px, 0); }
+  64% { opacity: 0.65; clip-path: inset(58% 0 18% 0); transform: translate(2px, 0); }
+  78% { opacity: 0.75; clip-path: inset(30% 0 44% 0); transform: translate(-2px, 0); }
+  80% { opacity: 0.55; clip-path: inset(74% 0 6% 0); transform: translate(1px, 0); }
+  92% { opacity: 0.7; clip-path: inset(18% 0 60% 0); transform: translate(-1px, 0); }
 }
 @keyframes introGlitchB {
-  0% { transform: translate(4px, 0); clip-path: inset(72% 0 8% 0); }
-  5% { transform: translate(-3px, -1px); clip-path: inset(12% 0 62% 0); }
-  10% { transform: translate(4px, 1px); clip-path: inset(44% 0 30% 0); }
-  15% { transform: translate(-4px, 0); clip-path: inset(2% 0 84% 0); }
-  20% { transform: translate(3px, 1px); clip-path: inset(60% 0 12% 0); }
-  25% { transform: translate(-5px, -1px); clip-path: inset(26% 0 50% 0); }
-  30% { transform: translate(4px, 0); clip-path: inset(84% 0 4% 0); }
-  35% { transform: translate(-3px, 1px); clip-path: inset(16% 0 64% 0); }
-  40% { transform: translate(4px, -1px); clip-path: inset(52% 0 20% 0); }
-  45% { transform: translate(-4px, 0); clip-path: inset(8% 0 78% 0); }
-  50% { transform: translate(3px, 1px); clip-path: inset(68% 0 10% 0); }
-  55% { transform: translate(-5px, -1px); clip-path: inset(30% 0 46% 0); }
-  60% { transform: translate(4px, 0); clip-path: inset(0% 0 88% 0); }
-  65% { transform: translate(-3px, 1px); clip-path: inset(56% 0 16% 0); }
-  70% { transform: translate(4px, -1px); clip-path: inset(20% 0 58% 0); }
-  75% { transform: translate(-4px, 0); clip-path: inset(76% 0 6% 0); }
-  80% { transform: translate(3px, 1px); clip-path: inset(38% 0 36% 0); }
-  85% { transform: translate(-5px, -1px); clip-path: inset(4% 0 82% 0); }
-  90% { transform: translate(4px, 0); clip-path: inset(64% 0 12% 0); }
-  95% { transform: translate(-3px, 1px); clip-path: inset(22% 0 56% 0); }
-  100% { transform: translate(4px, 0); clip-path: inset(72% 0 8% 0); }
+  0%, 60%, 66%, 76%, 82%, 90%, 94%, 100% { opacity: 0; clip-path: inset(100% 0 0 0); transform: none; }
+  62% { opacity: 0.7; clip-path: inset(66% 0 12% 0); transform: translate(2px, 0); }
+  64% { opacity: 0.55; clip-path: inset(24% 0 52% 0); transform: translate(-1px, 0); }
+  78% { opacity: 0.65; clip-path: inset(52% 0 24% 0); transform: translate(2px, 0); }
+  80% { opacity: 0.5; clip-path: inset(6% 0 78% 0); transform: translate(-1px, 0); }
+  92% { opacity: 0.6; clip-path: inset(40% 0 38% 0); transform: translate(1px, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
