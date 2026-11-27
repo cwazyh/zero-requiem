@@ -10,8 +10,8 @@
   <link rel="canonical" href="https://cwazyh.github.io/zero-requiem/mod.html">
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/mod.html">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style.css?v=33">
-  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=33">
+  <link rel="stylesheet" href="assets/style.css?v=34">
+  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=34">
 </head>
 <body>
   <header class="topbar">
@@ -110,6 +110,7 @@
     </div>
     <div class="mp-tools">
       <button id="mp-queue" type="button" aria-label="Open queue" aria-expanded="false"></button>
+      <span class="mp-tool-separator" aria-hidden="true"></span>
       <button id="mp-mode" type="button" aria-label="Random soundtrack" aria-pressed="true" title="Random soundtrack"></button>
       <div class="mp-volume-wrap">
         <button id="mp-volume" class="mp-volume-toggle" type="button" aria-label="Volume" aria-expanded="false"></button>
@@ -121,19 +122,18 @@
           <button id="mp-popup-mute" type="button" aria-label="Mute"></button>
         </div>
       </div>
-      <div class="mp-queue-popup" id="mp-queue-popup" aria-hidden="true">
-        <div class="mp-queue-head"><strong>Queue</strong><span id="mp-queue-count">0 tracks</span></div>
-        <div class="mp-queue-list" id="mp-queue-list"></div>
-      </div>
-      <button id="mp-unmute" class="mp-unmute" type="button">Enable sound</button>
+    </div>
+    <div class="mp-queue-popup" id="mp-queue-popup" aria-hidden="true">
+      <div class="mp-queue-head"><strong>Queue</strong><span id="mp-queue-count">0 tracks</span></div>
+      <div class="mp-queue-list" id="mp-queue-list"></div>
     </div>
     <audio id="mp-audio" preload="auto" autoplay playsinline></audio>
   </ag-glass>
 
-  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=33"></script>
-  <script src="assets/config.js?v=33"></script>
-  <script src="assets/panel.js?v=33"></script>
-  <script src="assets/profile.js?v=33"></script>
-  <script src="assets/music.js?v=33"></script>
+  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=34"></script>
+  <script src="assets/config.js?v=34"></script>
+  <script src="assets/panel.js?v=34"></script>
+  <script src="assets/profile.js?v=34"></script>
+  <script src="assets/music.js?v=34"></script>
 </body>
 </html>
