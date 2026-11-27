@@ -798,6 +798,21 @@ function clearQueueCloseTimer() {
   }
 }
 
+function syncArtSpan() {
+  if (!player) return;
+  const barHeight = player.getBoundingClientRect().height || 64;
+  player.style.setProperty("--art-bar-height", `${barHeight}px`);
+  const open = Boolean(queuePopup && queuePopup.classList.contains("open"));
+  if (open) {
+    const queueHeight = queuePopup.getBoundingClientRect().height || 0;
+    player.style.setProperty("--art-span", `${barHeight + queueHeight}px`);
+    player.classList.add("art-expanded");
+  } else {
+    player.style.setProperty("--art-span", `${barHeight}px`);
+    player.classList.remove("art-expanded");
+  }
+}
+
 function openQueuePopup(force = false) {
   clearQueueCloseTimer();
   if (!force) closeVolumePopup(true);
@@ -807,7 +822,8 @@ function openQueuePopup(force = false) {
     queuePopup.setAttribute("aria-hidden", "false");
   }
   if (queueButton) queueButton.setAttribute("aria-expanded", "true");
-  loadDurations();
+  syncArtSpan();
+  loadDurations().then(syncArtSpan);
 }
 
 function closeQueuePopup(force = false) {
@@ -817,6 +833,7 @@ function closeQueuePopup(force = false) {
     queuePopup.setAttribute("aria-hidden", "true");
   }
   if (queueButton) queueButton.setAttribute("aria-expanded", "false");
+  syncArtSpan();
 }
 
 function levelFromPointer(event) {
@@ -1027,4 +1044,9 @@ audio.volume = 0;
 audio.muted = true;
 audio.defaultMuted = true;
 updateVolumeVisual();
+syncArtSpan();
 loadTracks();
+
+window.addEventListener("resize", () => {
+  if (queuePopup && queuePopup.classList.contains("open")) syncArtSpan();
+});
