@@ -156,6 +156,8 @@ function hslToRgb(h, s, l) {
 
 function applyCoverAccent(image) {
   if (!player || !image) return;
+  const source = image.src || image.currentSrc;
+  if (source) player.style.setProperty("--queue-cover", `url("${source}")`);
   try {
     const canvas = document.createElement("canvas");
     canvas.width = 64;
@@ -486,7 +488,9 @@ function selectTrack(index, autoplay = false) {
     applyCoverAccent(cover);
   };
   cover.onload = () => applyCoverAccent(cover);
-  cover.src = coverSource(track);
+  const artSource = coverSource(track);
+  cover.src = artSource;
+  player.style.setProperty("--queue-cover", `url("${artSource}")`);
   if (cover.complete && cover.naturalWidth) applyCoverAccent(cover);
   updateLikeButton(track);
   updateActiveRow();
