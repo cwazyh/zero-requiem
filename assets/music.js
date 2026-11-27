@@ -34,6 +34,7 @@ const seekInput = document.getElementById("mp-seek");
 const currentNode = document.getElementById("mp-current");
 const durationNode = document.getElementById("mp-duration");
 const volumeToggle = document.getElementById("mp-volume");
+const volumeWrap = volumeToggle ? volumeToggle.closest(".mp-volume-wrap") : null;
 const volumePopup = document.getElementById("mp-volume-popup");
 const volumeTrack = document.getElementById("mp-volume-track");
 const volumeFill = document.getElementById("mp-volume-fill");
@@ -925,18 +926,9 @@ if (seekInput) {
   });
 }
 
-if (volumeToggle) {
-  volumeToggle.addEventListener("click", (event) => {
-    event.stopPropagation();
-    const open = Boolean(volumePopup && volumePopup.classList.contains("open"));
-    if (open) {
-      volumePinned = false;
-      closeVolumePopup(true);
-    } else {
-      volumePinned = true;
-      openVolumePopup(true);
-    }
-  });
+if (volumeWrap) {
+  volumeWrap.addEventListener("pointerenter", () => openVolumePopup(true));
+  volumeWrap.addEventListener("pointerleave", scheduleVolumeClose);
 }
 
 if (volumePopup) {
