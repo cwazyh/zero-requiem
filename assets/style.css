@@ -392,16 +392,22 @@ button.brand:hover span { color: #fff; }
 .mp-meta { display: flex; flex-direction: column; min-width: 0; }
 .mp-meta strong { font-size: 16px; font-weight: 400; line-height: 18px; letter-spacing: 0; color: #f2f3f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mp-meta span { margin-top: 4px; font-size: 12px; font-weight: 300; line-height: 15px; color: #949ba4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-like { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #b5bac1; transition: color 0.15s ease, background 0.15s ease; }
-.mp-like:hover { color: #f2f3f5; background: rgba(255, 255, 255, 0.09); }
+.mp-like { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #b5bac1; transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-like:hover { color: #f2f3f5; background: rgba(255, 255, 255, 0.09); transform: translateY(-1px) scale(1.06); }
+.mp-like:active { transform: scale(0.88); }
+.mp-like svg { transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-like:hover svg { transform: scale(1.12); }
 .mp-like[aria-pressed="true"] { color: #f23f43; }
 .mp-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .mp-controls { position: relative; z-index: 3; display: flex; align-items: center; gap: 8px; pointer-events: auto; }
-.mp-controls button { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #b5bac1; transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease; }
-.mp-controls button:hover { color: #fff; background: rgba(255, 255, 255, 0.09); }
-.mp-controls button:active { transform: scale(0.96); }
+.mp-controls button { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #b5bac1; transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-controls button:hover { color: #fff; background: rgba(255, 255, 255, 0.09); transform: translateY(-1px) scale(1.06); }
+.mp-controls button:active { transform: scale(0.92); }
+.mp-controls button svg { transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-controls button:hover svg { transform: scale(1.08); }
 .mp-controls button.primary { width: 34px; height: 34px; border-radius: 50%; background: #f2f3f5; color: #1e1f22; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
-.mp-controls button.primary:hover { background: #fff; transform: scale(1.05); }
+.mp-controls button.primary:hover { background: #fff; transform: scale(1.08); }
+.mp-controls button.primary:active { transform: scale(0.94); }
 .mp-controls button.primary svg { width: 16px; height: 16px; }
 .mp-timeline { position: absolute; inset: 0; z-index: 2; pointer-events: auto; }
 .mp-timeline span { display: none; }
@@ -423,9 +429,12 @@ button.brand:hover span { color: #fff; }
 .mp-seek:focus, .mp-seek:focus-visible { outline: none; box-shadow: none; }
 .mp-seek::-webkit-slider-runnable-track, .mp-seek::-moz-range-track, .mp-seek::-moz-range-progress { background: transparent; border: 0; outline: none; box-shadow: none; }
 .mp-seek::-webkit-slider-thumb, .mp-seek::-moz-range-thumb { appearance: none; -webkit-appearance: none; width: 0; height: 0; border: 0; opacity: 0; }
-.mp-tools { position: static; justify-self: end; display: flex; align-items: center; gap: 2px; padding: 3px; margin-right: 18px; border-radius: 8px; background: #141414; border: 1px solid rgba(255, 255, 255, 0.04); overflow: visible; }
-.mp-tools > button, .mp-volume-toggle { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #dcdee1; background: transparent !important; position: relative; transition: color 0.15s ease, background 0.15s ease; }
-.mp-tools > button:hover, .mp-volume-toggle:hover { color: #fff; background: rgba(255, 255, 255, 0.09) !important; }
+.mp-tools { position: static; justify-self: end; align-self: center; display: flex; align-items: center; justify-content: flex-end; gap: 2px; height: 36px; padding: 3px; margin-right: 18px; border-radius: 10px; background: #141414; border: 1px solid rgba(255, 255, 255, 0.04); overflow: visible; }
+.mp-tools > button, .mp-volume-toggle { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #dcdee1; background: transparent !important; position: relative; transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-tools > button:hover, .mp-volume-toggle:hover { color: #fff; background: rgba(255, 255, 255, 0.09) !important; transform: translateY(-1px) scale(1.06); }
+.mp-tools > button:active, .mp-volume-toggle:active { transform: scale(0.92); }
+.mp-tools > button svg, .mp-volume-toggle svg { transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-tools > button:hover svg, .mp-volume-toggle:hover svg { transform: scale(1.1); }
 .mp-tools > button.active { color: #fff; background: rgba(255, 255, 255, 0.14) !important; }
 .mp-one { position: absolute; right: 1px; bottom: 1px; font-size: 8px; line-height: 1; }
 .mp-divider { width: 1px; height: 16px; margin: 0 3px; background: rgba(255, 255, 255, 0.1); }
