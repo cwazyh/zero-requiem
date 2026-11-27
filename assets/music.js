@@ -58,9 +58,10 @@ let volumeCloseTimer = null;
 let queuePinned = false;
 let queueCloseTimer = null;
 let queueDragging = false;
-let suppressQueueClick = false;
+let suppressQueueClickUntil = 0;
 let draggedIndex = null;
 const durations = new Map();
+const placeholderCovers = new Map();
 
 function readStorage(key) {
   try {
@@ -220,8 +221,68 @@ function applyCoverAccent(image) {
   }
 }
 
+function hashTrack(track) {
+  const value = `${track.file}|${track.title}|${track.artist}`;
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function placeholderCover(track) {
+  if (placeholderCovers.has(track.file)) return placeholderCovers.get(track.file);
+  const palettes = [
+    ["#2c393d", "#4c595d"],
+    ["#141616", "#4c595d"],
+    ["#4c595d", "#cccfd2"],
+    ["#440000", "#2c393d"],
+    ["#2c393d", "#5865f2"],
+  ];
+  const hash = hashTrack(track);
+  const [from, to] = palettes[hash % palettes.length];
+  const initials = String(track.title || "ZR")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase() || "ZR";
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 96;
+  canvas.height = 96;
+  const context = canvas.getContext("2d");
+  if (!context) {
+    placeholderCovers.set(track.file, FALLBACK_COVER);
+    return FALLBACK_COVER;
+  }
+  const gradient = context.createLinearGradient(0, 0, 96, 96);
+  gradient.addColorStop(0, to);
+  gradient.addColorStop(1, from);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 96, 96);
+  const glow = context.createRadialGradient(74, 22, 4, 74, 22, 70);
+  glow.addColorStop(0, "rgba(255, 255, 255, 0.24)");
+  glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+  context.fillStyle = glow;
+  context.fillRect(0, 0, 96, 96);
+  context.fillStyle = "rgba(255, 255, 255, 0.9)";
+  context.font = "600 30px -apple-system, BlinkMacSystemFont, sans-serif";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(initials, 48, 48);
+  context.fillStyle = "rgba(255, 255, 255, 0.42)";
+  context.font = "600 9px -apple-system, BlinkMacSystemFont, sans-serif";
+  context.fillText("ZR // AUDIO", 48, 82);
+  const dataUrl = canvas.toDataURL("image/png");
+  placeholderCovers.set(track.file, dataUrl);
+  return dataUrl;
+}
+
 function coverSource(track) {
-  return track.cover ? `${AUDIO_BASE}covers/${track.cover}` : FALLBACK_COVER;
+  return track.cover ? `${AUDIO_BASE}covers/${track.cover}` : placeholderCover(track);
 }
 
 function setIcon(button, icon, label) {
@@ -285,7 +346,10 @@ function updateLikeButton(track) {
 function updateActiveRow() {
   document.querySelectorAll(".track-row, .mp-queue-row").forEach((row) => {
     const index = Number(row.dataset.index);
-    row.classList.toggle("active", index === currentIndex);
+    const active = index === currentIndex;
+    row.classList.toggle("active", active);
+    if (active) row.setAttribute("aria-current", "true");
+    else row.removeAttribute("aria-current");
   });
 }
 
@@ -397,7 +461,8 @@ function selectTrack(index, autoplay = false) {
   titleNode.textContent = track.title;
   artistNode.textContent = track.artist;
   cover.onerror = () => {
-    cover.src = FALLBACK_COVER;
+    cover.onerror = null;
+    cover.src = placeholderCover(track);
     applyCoverAccent(cover);
   };
   cover.onload = () => applyCoverAccent(cover);
@@ -465,7 +530,7 @@ function buildTrackList() {
     image.src = coverSource(track);
     image.alt = "";
     image.loading = "lazy";
-    image.onerror = () => { image.src = FALLBACK_COVER; };
+    image.onerror = () => { image.onerror = null; image.src = placeholderCover(track); };
 
     const copy = document.createElement("span");
     copy.className = "track-copy";
@@ -483,33 +548,47 @@ function buildTrackList() {
 }
 
 function updateQueueDurations() {
+  const known = tracks.filter((track) => durations.has(track.file));
+  if (queueCount) {
+    const total = known.reduce((sum, track) => sum + (durations.get(track.file) || 0), 0);
+    queueCount.textContent = known.length === tracks.length && tracks.length
+      ? `${tracks.length} tracks · ${formatTime(total)}`
+      : `${tracks.length} tracks`;
+  }
   if (!queueList) return;
   queueList.querySelectorAll(".mp-queue-row").forEach((row, index) => {
     const node = row.querySelector(".mp-queue-duration");
     const track = tracks[index];
-    if (node && track) node.textContent = formatTime(durations.get(track.file) || 0);
+    if (!node || !track) return;
+    node.textContent = durations.has(track.file) ? formatTime(durations.get(track.file) || 0) : "--:--";
   });
 }
 
 function buildQueueList() {
   if (!queueList) return;
+  const previousScroll = queueList.scrollTop;
   queueList.textContent = "";
   tracks.forEach((track, index) => {
     const row = document.createElement("div");
     row.className = "mp-queue-row";
-    row.draggable = true;
     row.dataset.index = String(index);
+    row.style.setProperty("--queue-index", String(index));
+    row.setAttribute("aria-label", `Play ${track.title} by ${track.artist}`);
 
     const grip = document.createElement("span");
     grip.className = "mp-queue-grip";
     grip.innerHTML = ICONS.grip;
-    grip.setAttribute("aria-hidden", "true");
+    grip.draggable = true;
+    grip.tabIndex = 0;
+    grip.title = "Drag to reorder";
+    grip.setAttribute("role", "button");
+    grip.setAttribute("aria-label", `Reorder ${track.title}`);
 
     const image = document.createElement("img");
     image.src = coverSource(track);
     image.alt = "";
     image.loading = "lazy";
-    image.onerror = () => { image.src = FALLBACK_COVER; };
+    image.onerror = () => { image.onerror = null; image.src = placeholderCover(track); };
 
     const copy = document.createElement("span");
     copy.className = "mp-queue-copy";
@@ -519,20 +598,21 @@ function buildQueueList() {
     artist.textContent = track.artist;
     copy.append(name, artist);
 
+    const now = document.createElement("span");
+    now.className = "mp-queue-now";
+    now.setAttribute("aria-hidden", "true");
+    now.innerHTML = "<i></i><i></i><i></i>";
+
     const duration = document.createElement("span");
     duration.className = "mp-queue-duration";
-    duration.textContent = formatTime(durations.get(track.file) || 0);
+    duration.textContent = durations.has(track.file) ? formatTime(durations.get(track.file) || 0) : "--:--";
 
-    row.append(grip, image, copy, duration);
+    row.append(grip, image, copy, now, duration);
     row.addEventListener("click", () => {
-      if (suppressQueueClick) {
-        suppressQueueClick = false;
-        return;
-      }
+      if (performance.now() < suppressQueueClickUntil) return;
       selectTrack(index, true);
-      closeQueuePopup(true);
     });
-    row.addEventListener("dragstart", (event) => {
+    grip.addEventListener("dragstart", (event) => {
       draggedIndex = index;
       queueDragging = true;
       clearQueueCloseTimer();
@@ -540,14 +620,39 @@ function buildQueueList() {
       row.classList.add("dragging");
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", String(index));
+      const ghost = row.cloneNode(true);
+      ghost.style.position = "fixed";
+      ghost.style.top = "-1000px";
+      ghost.style.left = "-1000px";
+      ghost.style.width = `${row.offsetWidth}px`;
+      document.body.appendChild(ghost);
+      event.dataTransfer.setDragImage(ghost, 24, 24);
+      window.setTimeout(() => ghost.remove(), 0);
     });
-    row.addEventListener("dragend", () => {
+    grip.addEventListener("dragend", () => {
       clearDragMarks();
       draggedIndex = null;
       queueDragging = false;
-      suppressQueueClick = true;
+      suppressQueueClickUntil = performance.now() + 250;
+    });
+    grip.addEventListener("keydown", (event) => {
+      const focusGrip = (target) => {
+        const rows = queueList.querySelectorAll(".mp-queue-row");
+        const row = rows[target];
+        if (row) row.querySelector(".mp-queue-grip")?.focus();
+      };
+      if (event.key === "ArrowUp" && index > 0) {
+        event.preventDefault();
+        reorderTrack(index, index - 1);
+        focusGrip(index - 1);
+      } else if (event.key === "ArrowDown" && index < tracks.length - 1) {
+        event.preventDefault();
+        reorderTrack(index, index + 2);
+        focusGrip(index + 1);
+      }
     });
     row.addEventListener("dragover", (event) => {
+      if (!queueDragging) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
       const rect = row.getBoundingClientRect();
@@ -563,11 +668,14 @@ function buildQueueList() {
       const insertion = row.classList.contains("drop-before") ? target : target + 1;
       clearDragMarks();
       draggedIndex = null;
+      queueDragging = false;
+      suppressQueueClickUntil = performance.now() + 250;
       reorderTrack(from, insertion);
     });
     queueList.append(row);
   });
-  if (queueCount) queueCount.textContent = `${tracks.length} tracks`;
+  queueList.scrollTop = previousScroll;
+  updateQueueDurations();
   updateActiveRow();
 }
 
@@ -719,6 +827,26 @@ setIcon(previousButton, "previous", "Previous track");
 setIcon(nextButton, "next", "Next track");
 setIcon(queueButton, "queue", "Open queue");
 updateVolumeVisual();
+
+if (queueList) {
+  queueList.addEventListener("dragover", (event) => {
+    if (!queueDragging || event.target !== queueList) return;
+    event.preventDefault();
+    clearDropMarks();
+    const last = queueList.querySelector(".mp-queue-row:last-child");
+    if (last) last.classList.add("drop-after");
+  });
+  queueList.addEventListener("drop", (event) => {
+    if (event.target !== queueList || draggedIndex === null) return;
+    event.preventDefault();
+    const from = draggedIndex;
+    clearDragMarks();
+    draggedIndex = null;
+    queueDragging = false;
+    suppressQueueClickUntil = performance.now() + 250;
+    reorderTrack(from, tracks.length);
+  });
+}
 
 if (playButton) playButton.addEventListener("click", togglePlay);
 if (previousButton) previousButton.addEventListener("click", () => selectTrack(nextIndex(-1), true));
