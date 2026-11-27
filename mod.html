@@ -88,7 +88,33 @@
   </main>
 
   <footer>Zero://Requiem • Staff access is role-gated through Discord OAuth2</footer>
+
+  <div class="music-player" id="music-player">
+    <div class="mp-track">
+      <img id="mp-cover" src="assets/logo.png" alt="">
+      <div><strong id="mp-title">Soundtrack</strong><span id="mp-artist">Loading...</span></div>
+    </div>
+    <div class="mp-controls">
+      <button id="mp-shuffle" type="button" aria-label="Shuffle off">⤨</button>
+      <button id="mp-prev" type="button" aria-label="Previous">⏮</button>
+      <button id="mp-play" class="primary" type="button" aria-label="Play">▶</button>
+      <button id="mp-next" type="button" aria-label="Next">⏭</button>
+      <button id="mp-repeat" type="button" aria-label="Repeat off">↻</button>
+    </div>
+    <div class="mp-timeline">
+      <span id="mp-current">0:00</span>
+      <input id="mp-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+      <span id="mp-duration">0:00</span>
+    </div>
+    <div class="mp-volume">
+      <button id="mp-mute" type="button" aria-label="Mute">🔊</button>
+      <input id="mp-volume" type="range" min="0" max="1" value="0.8" step="0.01" aria-label="Volume">
+    </div>
+    <audio id="mp-audio" preload="metadata"></audio>
+  </div>
+
   <script src="assets/config.js"></script>
   <script src="assets/panel.js"></script>
+  <script src="assets/music.js"></script>
 </body>
 </html>
