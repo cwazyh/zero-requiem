@@ -10,10 +10,39 @@
   <link rel="canonical" href="https://cwazyh.github.io/zero-requiem/mod.html">
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/mod.html">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style.css?v=34">
-  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=34">
+  <link rel="stylesheet" href="assets/style.css?v=35">
+  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=35">
 </head>
 <body>
+  <div class="intro" id="intro" role="dialog" aria-label="Secure uplink">
+    <div class="intro-rail" aria-hidden="true">
+      <img src="assets/logo.png" alt="">
+      <span class="rail-glyph active">◆</span>
+      <span class="rail-glyph">⌁</span>
+      <span class="rail-glyph">◈</span>
+      <span class="rail-glyph">⬡</span>
+      <span class="rail-glyph">⟁</span>
+    </div>
+    <div class="intro-frame" aria-hidden="true"></div>
+    <div class="intro-stage">
+      <div class="intro-core" aria-hidden="true">
+        <span class="intro-ring one"></span>
+        <span class="intro-ring two"></span>
+        <span class="intro-ring three"></span>
+        <img class="intro-logo" src="assets/logo.png" alt="">
+        <span class="intro-scan"></span>
+      </div>
+      <p class="intro-kicker">Zero://Requiem</p>
+      <h1 class="intro-title" data-text="SECURE UPLINK">SECURE UPLINK</h1>
+      <p class="intro-status" id="intro-status">HANDSHAKE // 00%</p>
+      <div class="intro-progress" aria-hidden="true"><span id="intro-progress-fill"></span></div>
+      <button class="intro-access" id="intro-access" type="button" disabled>
+        <span class="access-mark">//</span> ACCESS THE SITE <span class="access-arrow">→</span>
+      </button>
+      <p class="intro-note">AUDIO LINK REQUIRES MANUAL AUTHORISATION</p>
+    </div>
+    <div class="intro-footer">ZR // NODE 01 // ENCRYPTED SESSION</div>
+  </div>
   <header class="topbar">
     <div class="brand"><img src="assets/logo.png" alt="Zero://Requiem logo"><span>Zero://Requiem</span></div>
     <nav class="nav">
@@ -115,8 +144,8 @@
       <div class="mp-volume-wrap">
         <button id="mp-volume" class="mp-volume-toggle" type="button" aria-label="Volume" aria-expanded="false"></button>
         <div class="mp-volume-popup" id="mp-volume-popup" aria-hidden="true">
-          <span id="mp-volume-percent">80%</span>
-          <div class="mp-volume-track" id="mp-volume-track" role="slider" aria-label="Volume" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" tabindex="0">
+          <span id="mp-volume-percent">70%</span>
+          <div class="mp-volume-track" id="mp-volume-track" role="slider" aria-label="Volume" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
             <div class="mp-volume-fill" id="mp-volume-fill"></div>
           </div>
           <button id="mp-popup-mute" type="button" aria-label="Mute"></button>
@@ -127,13 +156,14 @@
       <div class="mp-queue-head"><strong>Queue</strong><span id="mp-queue-count">0 tracks</span></div>
       <div class="mp-queue-list" id="mp-queue-list"></div>
     </div>
-    <audio id="mp-audio" preload="auto" autoplay playsinline></audio>
+    <audio id="mp-audio" preload="auto" playsinline></audio>
   </ag-glass>
 
-  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=34"></script>
-  <script src="assets/config.js?v=34"></script>
-  <script src="assets/panel.js?v=34"></script>
-  <script src="assets/profile.js?v=34"></script>
-  <script src="assets/music.js?v=34"></script>
+  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=35"></script>
+  <script src="assets/config.js?v=35"></script>
+  <script src="assets/panel.js?v=35"></script>
+  <script src="assets/profile.js?v=35"></script>
+  <script src="assets/music.js?v=35"></script>
+  <script src="assets/intro.js?v=35"></script>
 </body>
 </html>
