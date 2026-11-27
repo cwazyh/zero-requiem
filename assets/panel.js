@@ -30,6 +30,30 @@ async function api(path) {
   return response.json();
 }
 
+function applyProfile(me) {
+  const avatar = document.getElementById("profile-avatar");
+  const name = document.getElementById("profile-name");
+  const handle = document.getElementById("profile-handle");
+  const presence = document.getElementById("profile-status");
+  const dot = document.getElementById("profile-status-dot");
+  if (!avatar || !name || !handle || !presence || !dot) return;
+  if (!me || !me.authenticated) {
+    avatar.src = "assets/logo.png";
+    name.textContent = "Not signed in";
+    handle.textContent = "Sign in with Discord to see your profile";
+    presence.textContent = "";
+    dot.style.background = "#80848e";
+    return;
+  }
+  if (me.avatar_url) avatar.src = me.avatar_url;
+  avatar.onerror = () => { avatar.src = "assets/logo.png"; };
+  name.textContent = me.display_name || me.username || "Discord user";
+  handle.textContent = me.handle ? `@${me.handle} • ${me.id}` : me.id;
+  const custom = me.custom_status ? ` — ${me.custom_status}` : "";
+  presence.textContent = `${me.status_label || "Offline"}${custom}`;
+  dot.style.background = me.status_color || "#80848e";
+}
+
 function timestamp(value) {
   if (!value) return "unknown";
   return new Date(value * 1000).toLocaleString();
@@ -43,12 +67,14 @@ function showDenied(message) {
 
 async function loadSession() {
   if (!BASE) {
+    applyProfile(null);
     userInfo.textContent = "OAuth backend is not connected.";
     showDenied("Web sign-in needs the OAuth backend. Staff tools are available inside Discord for now.");
     return;
   }
   try {
     const me = await api("/api/me");
+    applyProfile(me);
     if (!me.authenticated) {
       showDenied("You need to sign in with Discord before opening the Mod Panel.");
       return;
