@@ -384,7 +384,6 @@ function setProgress(value) {
   }
   if (player) {
     player.style.setProperty("--mp-progress-scale", String(clamped / 100));
-    player.classList.toggle("full-progress", clamped >= 99.5);
   }
 }
 
