@@ -31,6 +31,8 @@ async function api(path) {
 }
 
 function applyProfile(me) {
+  window.ZR_PROFILE = me || null;
+  window.dispatchEvent(new CustomEvent("zr:profile", { detail: window.ZR_PROFILE }));
   const avatar = document.getElementById("profile-avatar");
   const name = document.getElementById("profile-name");
   const handle = document.getElementById("profile-handle");
