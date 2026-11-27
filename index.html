@@ -15,7 +15,9 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><img src="assets/logo.png" alt="Zero://Requiem logo"><span>Zero://Requiem</span></div>
+    <button class="brand" id="brand-menu" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Open menu">
+      <img src="assets/logo.png" alt="Zero://Requiem logo"><span>Zero://Requiem</span>
+    </button>
     <nav class="nav">
       <a href="#about">About</a>
       <a href="#arthur">Arthur</a>
@@ -23,6 +25,32 @@
       <a href="mod.html">Mod Panel</a>
     </nav>
   </header>
+
+  <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
+  <aside class="sidebar" id="sidebar" aria-hidden="true">
+    <div class="sidebar-head">
+      <img src="assets/logo.png" alt="" class="sidebar-logo">
+      <div><strong>Zero://Requiem</strong><span>Navigation</span></div>
+      <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Close menu">×</button>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#about">About</a>
+      <a href="#arthur">Arthur</a>
+      <a href="#elements">Elements</a>
+      <a href="mod.html">Mod Panel</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="profile-card" id="profile-card">
+        <div class="avatar-wrap"><img id="profile-avatar" src="assets/logo.png" alt=""><span class="status-dot" id="profile-status-dot"></span></div>
+        <div class="profile-copy">
+          <strong id="profile-name">Not signed in</strong>
+          <span id="profile-handle">Sign in with Discord to see your profile</span>
+          <em id="profile-status"></em>
+        </div>
+      </div>
+      <div id="sidebar-verify-slot"></div>
+    </div>
+  </aside>
 
   <main class="hero">
     <section>
