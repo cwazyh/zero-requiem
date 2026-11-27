@@ -55,6 +55,8 @@ let repeatModeIndex = 0;
 let rateIndex = 0;
 let lastVolume = DEFAULT_VOLUME;
 let autoplayBlocked = true;
+let seeking = false;
+let resumeAfterSeek = false;
 let volumePinned = false;
 let volumeCloseTimer = null;
 
@@ -510,6 +512,8 @@ updatePlayIcon();
 updateShuffleIcon();
 updateRepeatIcon();
 updateSpeedIcon();
+setIcon(previousButton, "previous", "Previous track");
+setIcon(nextButton, "next", "Next track");
 setIcon(openButton, "open", "Open player");
 setIcon(queueButton, "queue", "Queue");
 updateVolumeVisual();
@@ -541,10 +545,37 @@ if (speedButton) {
 }
 
 if (seekInput) {
-  seekInput.addEventListener("input", () => {
+  const applySeek = () => {
     if (!Number.isFinite(audio.duration)) return;
     audio.currentTime = (Number(seekInput.value) / 100) * audio.duration;
     updateSeekVisual();
+  };
+
+  seekInput.addEventListener("pointerdown", () => {
+    seeking = true;
+    resumeAfterSeek = !audio.paused && !audio.ended;
+    audio.pause();
+  });
+
+  seekInput.addEventListener("input", () => {
+    const value = Number(seekInput.value);
+    seekInput.style.setProperty("--progress", `${value}%`);
+    if (player) player.style.setProperty("--mp-progress-scale", String(value / 100));
+    if (!seeking) applySeek();
+  });
+
+  const finishSeek = () => {
+    if (!seeking) return;
+    seeking = false;
+    applySeek();
+    if (resumeAfterSeek) playAudio();
+  };
+
+  seekInput.addEventListener("pointerup", finishSeek);
+  seekInput.addEventListener("pointercancel", finishSeek);
+  seekInput.addEventListener("lostpointercapture", finishSeek);
+  seekInput.addEventListener("change", () => {
+    if (!seeking) applySeek();
   });
 }
 
