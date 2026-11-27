@@ -510,6 +510,8 @@ updatePlayIcon();
 updateShuffleIcon();
 updateRepeatIcon();
 updateSpeedIcon();
+setIcon(openButton, "open", "Open player");
+setIcon(queueButton, "queue", "Queue");
 updateVolumeVisual();
 
 if (playButton) playButton.addEventListener("click", togglePlay);
