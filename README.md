@@ -99,9 +99,9 @@ Moderation, message, server, and voice logs are not exposed by the bot data laye
 
 ## Soundtrack
 
-The static site ships ten local MP3 files under `docs/assets/music/`. The pinned bar mirrors the Linear desktop player: a 64px dark translucent container, 38px rounded cover, centred 34px circular play/pause, compact transport buttons, a right-side tool pill, a thin seek line, and a vertical light volume popup with a 72px slider and percentage label. A heart button saves a track locally.
+The static site ships ten local MP3 files under `docs/assets/music/`. The pinned bar follows the Linear desktop player source: a 64px rounded translucent container, 38px rounded cover, 16px title with 12px artist, centred 30px transport buttons around a 34px circular play/pause, a right-side dark tool pill, and a thin seek line pinned to the bottom edge. The tool pill contains shuffle, repeat, playback speed, volume, open player, and queue controls. The vertical light volume popup follows the same layout: percentage, 72px slider, then mute icon. A heart button saves a track locally.
 
-Music starts automatically on page load. Browsers can block audible autoplay, so the player retries muted and shows an `Enable sound` pill; the first pointer interaction also unmutes it. On the very first visit in a browser, `COLORS` always starts. Every later visit picks one of all ten tracks uniformly (10% each) and enables shuffle.
+Music starts automatically on page load, muted first so browsers allow it. An `Enable sound` pill is shown while muted, and the first pointer interaction unmutes it. On the very first visit in a browser, `COLORS` always starts. Every later visit picks one of all ten tracks uniformly (10% each) and enables shuffle.
 
 Track metadata lives in `docs/assets/music/tracks.json`. Cover images belong in `docs/assets/music/covers/`; set each track's `cover` field to the image filename. Until covers are supplied, the player falls back to `assets/logo.png`.
 
