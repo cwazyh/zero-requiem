@@ -92,23 +92,35 @@
   <div class="music-player" id="music-player">
     <div class="mp-track">
       <img id="mp-cover" src="assets/logo.png" alt="">
-      <div><strong id="mp-title">Soundtrack</strong><span id="mp-artist">Loading...</span></div>
+      <div class="mp-meta"><strong id="mp-title">Soundtrack</strong><span id="mp-artist">Loading...</span></div>
+      <button id="mp-like" class="mp-like" type="button" aria-label="Add to favourites" aria-pressed="false">♡</button>
     </div>
-    <div class="mp-controls">
+    <div class="mp-center">
+      <div class="mp-controls">
+        <button id="mp-prev" type="button" aria-label="Previous">⏮</button>
+        <button id="mp-play" class="primary" type="button" aria-label="Play">▶</button>
+        <button id="mp-next" type="button" aria-label="Next">⏭</button>
+      </div>
+      <div class="mp-timeline">
+        <span id="mp-current">0:00</span>
+        <input id="mp-seek" class="mp-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+        <span id="mp-duration">0:00</span>
+      </div>
+    </div>
+    <div class="mp-tools">
       <button id="mp-shuffle" type="button" aria-label="Shuffle off">⤨</button>
-      <button id="mp-prev" type="button" aria-label="Previous">⏮</button>
-      <button id="mp-play" class="primary" type="button" aria-label="Play">▶</button>
-      <button id="mp-next" type="button" aria-label="Next">⏭</button>
       <button id="mp-repeat" type="button" aria-label="Repeat off">↻</button>
-    </div>
-    <div class="mp-timeline">
-      <span id="mp-current">0:00</span>
-      <input id="mp-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek">
-      <span id="mp-duration">0:00</span>
-    </div>
-    <div class="mp-volume">
-      <button id="mp-mute" type="button" aria-label="Mute">🔊</button>
-      <input id="mp-volume" type="range" min="0" max="1" value="0.8" step="0.01" aria-label="Volume">
+      <div class="mp-volume-wrap">
+        <button id="mp-volume" class="mp-volume-toggle" type="button" aria-label="Volume" aria-expanded="false">🔊</button>
+        <div class="mp-volume-popup" id="mp-volume-popup" hidden>
+          <button id="mp-popup-mute" type="button" aria-label="Mute">🔊</button>
+          <div class="mp-volume-track" id="mp-volume-track" role="slider" aria-label="Volume" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" tabindex="0">
+            <div class="mp-volume-fill" id="mp-volume-fill"></div>
+          </div>
+          <span id="mp-volume-percent">80%</span>
+        </div>
+      </div>
+      <button id="mp-unmute" class="mp-unmute" type="button" hidden>Enable sound</button>
     </div>
     <audio id="mp-audio" preload="metadata"></audio>
   </div>
