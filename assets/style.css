@@ -341,6 +341,9 @@ button.brand:hover span { color: #fff; }
 .track-copy span { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .music-player {
+  --mp-accent: rgba(255, 255, 255, 0.12);
+  --mp-accent-solid: rgb(255, 255, 255);
+  --mp-progress-scale: 0;
   position: fixed;
   left: 12px;
   right: 12px;
@@ -350,12 +353,27 @@ button.brand:hover span { color: #fff; }
   grid-template-columns: 280px minmax(0, 1fr) 260px;
   align-items: center;
   height: 64px;
+  overflow: hidden;
+  isolation: isolate;
   border-radius: 24px;
   background: rgba(10, 10, 10, 0.9);
   backdrop-filter: blur(48px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
 }
+.music-player::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--mp-accent);
+  transform: scaleX(var(--mp-progress-scale));
+  transform-origin: left center;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.music-player > * { position: relative; z-index: 1; }
+.music-player > .mp-center { z-index: 2; }
 .music-player button {
   appearance: none;
   -webkit-appearance: none;
@@ -389,7 +407,7 @@ button.brand:hover span { color: #fff; }
   height: 2px;
   border-radius: 999px;
   appearance: none;
-  background: linear-gradient(to right, #f2f3f5 var(--progress, 0%), rgba(255, 255, 255, 0.15) var(--progress, 0%));
+  background: linear-gradient(to right, var(--mp-accent-solid) var(--progress, 0%), rgba(255, 255, 255, 0.15) var(--progress, 0%));
   cursor: pointer;
   transition: background 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -426,7 +444,9 @@ button.brand:hover span { color: #fff; }
 .mp-volume-track { position: relative; width: 6px; height: 72px; border-radius: 999px; background: rgba(0, 0, 0, 0.18); cursor: pointer; outline: none; transition: transform 0.15s ease; }
 .mp-volume-track:hover, .mp-volume-track:focus-visible { transform: scaleX(1.25); }
 .mp-volume-fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 999px; background: #f2f3f5; transition: height 0.1s ease-out; }
-.mp-unmute { position: absolute; right: 0; bottom: calc(100% + 12px); width: auto !important; height: auto !important; padding: 6px 10px; border-radius: 999px; background: #f2f3f5 !important; color: #1e1f22 !important; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.mp-unmute-spacer { width: 96px; flex: 0 0 96px; }
+.mp-unmute { position: absolute; right: 0; bottom: calc(100% + 12px); width: auto !important; height: auto !important; padding: 6px 10px; border-radius: 999px; background: #f2f3f5 !important; color: #1e1f22 !important; font-size: 11px; font-weight: 600; white-space: nowrap; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
+.mp-unmute.visible { visibility: visible; opacity: 1; pointer-events: auto; }
 
 .user-popout {
   position: fixed;
