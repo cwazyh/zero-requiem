@@ -394,20 +394,24 @@ button.brand:hover span { color: #fff; }
   --ag-tint: transparent;
   --ag-radius: 32px;
 }
-.music-player::before {
+.music-player::before,
+.music-player::after {
   content: "";
   position: absolute;
-  inset: 1px auto 1px 1px;
+  inset: 0;
   z-index: 0;
-  width: calc(var(--mp-progress-scale) * (100% - 2px));
   pointer-events: none;
-  border-radius: calc(var(--ag-radius) - 1px) 0 0 calc(var(--ag-radius) - 1px);
-  background: linear-gradient(90deg, var(--mp-accent-start), var(--mp-accent-mid), var(--mp-accent-end), var(--mp-accent-start));
-  background-size: 320% 100%;
+  border-radius: var(--ag-radius);
+  background-image: linear-gradient(90deg, var(--mp-accent-start), var(--mp-accent-mid), var(--mp-accent-end), var(--mp-accent-start));
+  background-size: 200% 100%;
   background-position: calc(var(--mp-progress-scale) * -100%) center;
-  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1), background-position 600ms cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.3s ease;
+  transition: background-position 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.music-player.full-progress::before { border-radius: calc(var(--ag-radius) - 1px); }
+.music-player::before { filter: brightness(0.58) saturate(0.92); }
+.music-player::after {
+  clip-path: inset(0 calc((1 - var(--mp-progress-scale)) * 100%) 0 0);
+  transition: clip-path 600ms cubic-bezier(0.22, 1, 0.36, 1), background-position 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
 .music-player > * { position: relative; z-index: 1; }
 .music-player > .mp-track, .music-player > .mp-tools, .music-player > .mp-queue-popup { z-index: 3; }
 .music-player button {
@@ -919,7 +923,7 @@ button.brand:hover span { color: #fff; }
   .track-row, .mp-controls button, .mp-tools button, .mp-like, .mp-volume-fill,
   .mp-volume-popup, .mp-queue-popup, .mp-queue-row, .user-popout, .popout-actions button { transform: none; transition: none; }
   .mp-queue-popup.open .mp-queue-row, .mp-queue-now i { animation: none; }
-  .music-player::before { transition: none; }
+  .music-player::before, .music-player::after { transition: none; }
   .intro::before, .intro-ring, .intro-rail img, .intro-logo, .intro-scan,
   .intro [data-text], .intro [data-text]::before, .intro [data-text]::after,
   .intro-progress span { animation: none; }
