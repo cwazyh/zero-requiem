@@ -2,6 +2,8 @@ const BASE = window.ZR_API_BASE || "";
 const FALLBACK_INVITE = "https://discord.gg/zkfc4kJHUV";
 const discordButton = document.getElementById("discord-button");
 const verifyButton = document.getElementById("verify-button");
+const modButton = document.getElementById("mod-panel-button");
+const sidebarModLink = document.getElementById("sidebar-mod-link");
 const status = document.getElementById("verify-status");
 const brandMenu = document.getElementById("brand-menu");
 const sidebar = document.getElementById("sidebar");
@@ -14,8 +16,16 @@ const profileHandle = document.getElementById("profile-handle");
 const profileStatus = document.getElementById("profile-status");
 const statusDot = document.getElementById("profile-status-dot");
 
+let lastVerifiedProfile = null;
+
+function loginHref() {
+  return BASE ? `${BASE}/auth/login` : FALLBACK_INVITE;
+}
+
 discordButton.href = FALLBACK_INVITE;
-verifyButton.href = BASE ? `${BASE}/auth/login` : FALLBACK_INVITE;
+verifyButton.href = loginHref();
+modButton.href = loginHref();
+sidebarModLink.href = loginHref();
 
 function openSidebar() {
   sidebar.classList.add("open");
@@ -47,6 +57,7 @@ sidebar.querySelectorAll(".sidebar-nav a").forEach((link) => {
 
 function applyProfile(me) {
   if (!me || !me.authenticated) {
+    lastVerifiedProfile = null;
     profileAvatar.src = "assets/logo.png";
     profileName.textContent = "Not signed in";
     profileHandle.textContent = "Sign in with Discord to see your profile";
@@ -54,6 +65,8 @@ function applyProfile(me) {
     statusDot.style.background = "#80848e";
     return;
   }
+
+  lastVerifiedProfile = me;
   if (me.avatar_url) profileAvatar.src = me.avatar_url;
   profileAvatar.onerror = () => { profileAvatar.src = "assets/logo.png"; };
   profileName.textContent = me.display_name || me.username || "Discord user";
@@ -63,13 +76,32 @@ function applyProfile(me) {
   statusDot.style.background = me.status_color || "#80848e";
 }
 
-function placeVerifyButton(authenticated, allowed) {
-  if (authenticated && allowed) {
-    verifyButton.textContent = "Verified — Staff";
+function applyAccess(me) {
+  const authenticated = Boolean(me && me.authenticated);
+  const allowed = authenticated && Boolean(me.allowed);
+  const member = authenticated && Boolean(me.member);
+
+  discordButton.hidden = member;
+  verifyButton.hidden = allowed;
+
+  if (allowed) {
+    modButton.textContent = "Mod Panel";
+    modButton.href = "mod.html";
+    sidebarModLink.textContent = "Mod Panel";
+    sidebarModLink.href = "mod.html";
+    verifySlot.replaceChildren();
     return;
   }
-  verifySlot.appendChild(verifyButton);
-  verifyButton.textContent = "Verify with Discord";
+
+  const label = authenticated ? "Verify — Staff role required" : "Verify with Discord";
+  modButton.textContent = label;
+  modButton.href = loginHref();
+  sidebarModLink.textContent = label;
+  sidebarModLink.href = loginHref();
+
+  if (verifySlot.firstElementChild !== verifyButton) verifySlot.appendChild(verifyButton);
+  verifyButton.textContent = label;
+  verifyButton.href = loginHref();
 }
 
 async function loadPublicConfig() {
@@ -87,16 +119,17 @@ async function loadPublicConfig() {
 async function loadSession() {
   if (!BASE) {
     applyProfile(null);
-    placeVerifyButton(false, false);
+    applyAccess(null);
     status.textContent = "Web verification needs the OAuth backend. For now, join Discord and accept the rules in #rules.";
     return;
   }
+
   try {
     const response = await fetch(`${BASE}/api/me`, { credentials: "include" });
     if (!response.ok) return;
     const data = await response.json();
     applyProfile(data);
-    placeVerifyButton(Boolean(data.authenticated), Boolean(data.allowed));
+    applyAccess(data);
     if (data.authenticated) {
       status.textContent = data.allowed
         ? `Signed in as ${data.display_name || data.username}. Mod Panel access is available.`
@@ -105,8 +138,10 @@ async function loadSession() {
       status.textContent = "Verify with Discord to unlock the server and see your profile here.";
     }
   } catch (_) {
-    applyProfile(null);
-    placeVerifyButton(false, false);
+    if (!lastVerifiedProfile) {
+      applyProfile(null);
+      applyAccess(null);
+    }
     status.textContent = "Session status is currently unavailable.";
   }
 }
