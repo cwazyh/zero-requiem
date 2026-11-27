@@ -684,11 +684,6 @@ function closeQueuePopup(force = false) {
   if (queueButton) queueButton.setAttribute("aria-expanded", "false");
 }
 
-function scheduleQueueClose() {
-  clearQueueCloseTimer();
-  queueCloseTimer = window.setTimeout(() => closeQueuePopup(), 360);
-}
-
 function levelFromPointer(event) {
   if (!volumeTrack) return audio.volume;
   const rect = volumeTrack.getBoundingClientRect();
@@ -842,6 +837,12 @@ if (queueButton) {
       openQueuePopup(true);
     }
   });
+  queueButton.onpointerenter = null;
+  queueButton.onpointerleave = null;
+  if (queuePopup) {
+    queuePopup.onpointerenter = null;
+    queuePopup.onpointerleave = null;
+  }
 }
 
 audio.addEventListener("play", updatePlayIcon);
