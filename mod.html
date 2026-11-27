@@ -10,7 +10,7 @@
   <link rel="canonical" href="https://cwazyh.github.io/zero-requiem/mod.html">
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/mod.html">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style.css?v=22">
+  <link rel="stylesheet" href="assets/style.css?v=23">
 </head>
 <body>
   <header class="topbar">
@@ -93,41 +93,45 @@
     <div class="mp-track">
       <img id="mp-cover" src="assets/logo.png" alt="">
       <div class="mp-meta"><strong id="mp-title">COLORS</strong><span id="mp-artist">FLOW</span></div>
-      <button id="mp-like" class="mp-like" type="button" aria-label="Add to favourites" aria-pressed="false">♡</button>
+      <button id="mp-like" class="mp-like" type="button" aria-label="Add to favourites" aria-pressed="false"></button>
     </div>
     <div class="mp-center">
-      <div class="mp-controls">
-        <button id="mp-prev" type="button" aria-label="Previous">⏮</button>
-        <button id="mp-play" class="primary" type="button" aria-label="Play">▶</button>
-        <button id="mp-next" type="button" aria-label="Next">⏭</button>
-      </div>
       <div class="mp-timeline">
         <span id="mp-current">0:00</span>
         <input id="mp-seek" class="mp-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek">
         <span id="mp-duration">0:00</span>
       </div>
+      <div class="mp-controls">
+        <button id="mp-prev" type="button" aria-label="Previous"></button>
+        <button id="mp-play" class="primary" type="button" aria-label="Play"></button>
+        <button id="mp-next" type="button" aria-label="Next"></button>
+      </div>
     </div>
     <div class="mp-tools">
-      <button id="mp-shuffle" type="button" aria-label="Shuffle off">⤨</button>
-      <button id="mp-repeat" type="button" aria-label="Repeat off">↻</button>
+      <button id="mp-shuffle" type="button" aria-label="Shuffle off"></button>
+      <button id="mp-repeat" type="button" aria-label="Repeat off"></button>
+      <button id="mp-speed" type="button" aria-label="Playback speed 1x" title="Playback speed: 1x"></button>
       <div class="mp-volume-wrap">
-        <button id="mp-volume" class="mp-volume-toggle" type="button" aria-label="Volume" aria-expanded="false">🔊</button>
+        <button id="mp-volume" class="mp-volume-toggle" type="button" aria-label="Volume" aria-expanded="false"></button>
         <div class="mp-volume-popup" id="mp-volume-popup" hidden>
-          <button id="mp-popup-mute" type="button" aria-label="Mute">🔊</button>
+          <span id="mp-volume-percent">80%</span>
           <div class="mp-volume-track" id="mp-volume-track" role="slider" aria-label="Volume" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80" tabindex="0">
             <div class="mp-volume-fill" id="mp-volume-fill"></div>
           </div>
-          <span id="mp-volume-percent">80%</span>
+          <button id="mp-popup-mute" type="button" aria-label="Mute"></button>
         </div>
       </div>
+      <button id="mp-open" type="button" aria-label="Open player"></button>
+      <span class="mp-divider" aria-hidden="true"></span>
+      <button id="mp-queue" type="button" aria-label="Queue"></button>
       <button id="mp-unmute" class="mp-unmute" type="button" hidden>Enable sound</button>
     </div>
-    <audio id="mp-audio" preload="metadata"></audio>
+    <audio id="mp-audio" preload="metadata" muted autoplay playsinline></audio>
   </div>
 
-  <script src="assets/config.js?v=22"></script>
-  <script src="assets/panel.js?v=22"></script>
-  <script src="assets/profile.js?v=22"></script>
-  <script src="assets/music.js?v=22"></script>
+  <script src="assets/config.js?v=23"></script>
+  <script src="assets/panel.js?v=23"></script>
+  <script src="assets/profile.js?v=23"></script>
+  <script src="assets/music.js?v=23"></script>
 </body>
 </html>
