@@ -15,7 +15,9 @@ const stageDuration = 700;
 
 stages.forEach((text, index) => {
   window.setTimeout(() => {
-    if (statusNode) statusNode.textContent = text;
+    if (!statusNode) return;
+    statusNode.textContent = text;
+    statusNode.dataset.text = text;
   }, index * stageDuration);
 });
 
