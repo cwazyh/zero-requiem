@@ -1,102 +1,50 @@
-# Zero://Requiem Web Portal & Mod Panel
+# Zero://Requiem
 
-Feature #8: a standalone web portal with a Discord OAuth2 login and a role-gated moderation panel. It is intentionally separate from the Discord bot (`arthur-bot.service`); no working bot module was modified.
+![Zero://Requiem](assets/banner.png)
 
-## Layout
+Web Portal and Discord OAuth2 Mod Panel for the `Zero://Requiem` Discord server.
 
-- `docs/` — static frontend, publishable to GitHub Pages. Contains Home, Mod Panel, assets, and `.nojekyll`.
-- `backend/` — Starlette service that owns OAuth2 secrets, sessions, role checks, and read-only bot data views.
-- `.env` — local secrets, already populated from the existing Discord bot `.env` on the VM and the local GitHub token note. This file is gitignored and mode `600`.
-- `.env.example` — template with empty values.
-- `requirements.txt` — Python dependencies for the backend.
+**Live site:** https://cwazyh.github.io/zero-requiem/  
+**Mod panel:** https://cwazyh.github.io/zero-requiem/mod.html  
+**Discord:** https://discord.gg/zkfc4kJHUV
 
-## What is already configured
+This is the single source repository for the static site. It contains no backend code, no `.env`, and no secrets.
 
-The following values were found and consolidated into `.env` without printing or committing them:
+## Repository layout
 
-- Discord OAuth client ID, client secret, application ID, public key, bot token, and guild ID from the bot VM `.env`.
-- A GitHub token from the local `Zero Requiem/.env/github-classic-token.md` note.
-- Owner role ID `1575826666041770046` and Mod role ID `1575630074865127434`.
-- A generated `SESSION_SECRET`.
-- `DISCORD_REDIRECT_URI=http://localhost:8000/auth/callback` for local development.
+| Path | Purpose |
+| --- | --- |
+| `index.html` | Home page: server identity, Arthur introduction, element roles, Join Discord and Verify actions |
+| `mod.html` | Role-gated Mod Panel entry point |
+| `assets/` | Server logo, server banner, Arthur logo, Arthur banner, role icons, styles and frontend scripts |
+| `README.md` | This document |
 
-`DISCORD_INVITE_URL` is set to `https://discord.gg/zkfc4kJHUV` for the Join Discord button.
+GitHub Pages publishes the `main` branch root.
 
-## GitHub Pages deployment
+## Home page
 
-The static site in `docs/` is published to the project repository `cwazyh/zero-requiem`, so Home lives at `https://cwazyh.github.io/zero-requiem/`. GitHub usernames cannot be renamed to `Zero://Requiem`, but the project path keeps the server name visible in the address bar. A custom domain such as `zerorequiem.com` would be needed for a bare branded host. The repository contains only static files: no secrets, no Python backend, and no `.env`. The older user-site root at `https://cwazyh.github.io/` redirects to this page.
+- Server banner and logo using the `1316374` / `2898237` palette.
+- `Meet Arthur` section with the bot logo, animated bot banner and feature cards.
+- Rules and verification, self roles, leveling, private VCs, tickets, case files and logs, server stats and honeypot.
+- Elements strip with all nine self-role icons.
 
-The frontend uses image assets from both the server and the bot:
+## Mod Panel
 
-- `assets/logo.png` and `assets/banner.png` — Zero://Requiem server identity.
-- `assets/arthur-logo.png` and `assets/arthur-banner.gif` — Arthur bot identity.
-- `assets/roles/*.png` — the nine self-role element icons.
+The Mod Panel is protected by Discord OAuth2. Access requires guild membership plus the Owner role `1575826666041770046` or the Mod role `1575630074865127434`. It reads bot data through a separately hosted Starlette backend; the client secret never reaches the browser.
 
-The Home page also introduces Arthur and lists its rules, self roles, leveling, private VCs, tickets, case files, logs, server stats, and honeypot features.
-
-GitHub Pages cannot run the OAuth token exchange or keep a client secret private. The browser talks to the separately hosted Starlette backend. Set the backend origin once by opening:
+The frontend discovers the backend origin from:
 
 `https://cwazyh.github.io/zero-requiem/?api=https://your-backend.example`
 
-`config.js` stores that value in `localStorage` under `zr_api_base`, so all later clicks use the backend automatically. Clear that key or pass another `?api=` value to switch backends.
+The value is stored in `localStorage.zr_api_base` and reused on later visits.
 
-## Redirect URI setup
+## OAuth redirect
 
-Add the exact Redirect URI of the **backend** in the Discord Developer Portal → OAuth2 → Redirects.
+GitHub Pages is static and cannot exchange an authorization code. Register the exact Redirect URI of the backend in the Discord Developer Portal, for example `https://your-backend.example/auth/callback`. Do not use a `cwazyh.github.io` callback URL.
 
-- Local: `http://localhost:8000/auth/callback`
-- Production backend on the root domain: `https://zerorequiem.com/auth/callback`
-- Production backend behind `/api`: `https://zerorequiem.com/api/auth/callback`
-- Production backend on a subdomain: `https://api.zerorequiem.com/auth/callback`
+## Security
 
-Important: `https://cwazyh.github.io/zero-requiem/auth/callback` is not used. GitHub Pages is static and cannot exchange the authorization code or keep `DISCORD_CLIENT_SECRET` private. The client secret is never sent to the browser.
-
-The backend redirects back to `FRONTEND_BASE_URL`, which is set to `https://cwazyh.github.io/zero-requiem`. `SESSION_COOKIE_SAMESITE=none` and CORS for that exact origin are already configured for cross-site login.
-
-## Run locally
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn backend.app:app --host 127.0.0.1 --port 8000
-```
-
-Open `http://localhost:8000/` for Home and `http://localhost:8000/mod` for the Mod Panel.
-
-## GitHub Pages / custom domain
-
-- Publish the `docs/` folder on the `main` branch of `cwazyh/zero-requiem` with GitHub Pages, or point a custom domain to the backend if you want a single origin.
-- With a custom domain on the backend, configure TLS and set `PUBLIC_BASE_URL`, `FRONTEND_BASE_URL`, and `DISCORD_REDIRECT_URI` to the public HTTPS URLs.
-- Keep `.env` outside the repository history. `.gitignore` already excludes it.
-
-## API endpoints
-
-Public:
-
-- `GET /api/public-config` — invite URL and guild ID.
-- `GET /api/me` — session status.
-- `GET /auth/login`, `GET /auth/callback`, `GET /auth/logout` — OAuth2 flow.
-
-Role-gated (Owner or Mod role):
-
-- `GET /api/overview` — deploy state, counters, optional guild counts.
-- `GET /api/cases?query=` — case files by user ID or transcript text.
-- `GET /api/logs?category=` — tickets, cases, and deploy events.
-- `GET /api/transcripts` — recent transcript files.
-- `GET /api/config` — safe configuration view.
-
-Moderation, message, server, and voice logs are not exposed by the bot data layer yet, so those feed categories show an empty state instead of stale data.
-
-## Tests
-
-```bash
-.venv/bin/python -m unittest discover -s tests -q
-```
-
-## Security notes
-
-- `DISCORD_CLIENT_SECRET`, `DISCORD_BOT_TOKEN`, `GITHUB_TOKEN`, and `SESSION_SECRET` stay server-side.
-- OAuth state is stored in the session and checked on callback.
-- Access requires guild membership plus at least one configured staff role.
-- All UI text, API responses, logs, and documentation are in English.
+- No secrets are committed to this repository.
+- OAuth state is stored server-side in the session.
+- The browser receives only public configuration: invite URL and guild ID.
+- All UI text and documentation are in English.
