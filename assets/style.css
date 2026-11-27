@@ -425,6 +425,7 @@ button.brand:hover span { color: #fff; }
   mix-blend-mode: soft-light;
 }
 .music-player > * { position: relative; z-index: 1; }
+#music-player > .mp-progress-layer { position: absolute; z-index: 0; }
 .music-player > .mp-track, .music-player > .mp-tools, .music-player > .mp-queue-popup { z-index: 3; }
 .music-player button {
   appearance: none;
