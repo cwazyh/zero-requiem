@@ -159,68 +159,72 @@ function applyCoverAccent(image) {
   if (!player || !image) return;
   const source = image.src || image.currentSrc;
   if (source) player.style.setProperty("--queue-cover", `url("${source}")`);
+  const fallback = () => {
+    player.style.setProperty("--mp-accent-start", "rgb(30, 31, 34)");
+    player.style.setProperty("--mp-accent-mid", "rgb(44, 47, 52)");
+    player.style.setProperty("--mp-accent-end", "rgb(20, 22, 22)");
+    player.style.setProperty("--mp-accent-solid", "#3a4145");
+  };
   try {
     const canvas = document.createElement("canvas");
     canvas.width = 64;
     canvas.height = 64;
     const context = canvas.getContext("2d", { willReadFrequently: true });
-    if (!context) return;
+    if (!context) return fallback();
     context.drawImage(image, 0, 0, 64, 64);
     const data = context.getImageData(0, 0, 64, 64).data;
-    let totalWeight = 0;
-    let weightedR = 0;
-    let weightedG = 0;
-    let weightedB = 0;
-    let totalR = 0;
-    let totalG = 0;
-    let totalB = 0;
-    const count = data.length / 4;
+    const bucketCount = 24;
+    const weights = new Array(bucketCount).fill(0);
+    const reds = new Array(bucketCount).fill(0);
+    const greens = new Array(bucketCount).fill(0);
+    const blues = new Array(bucketCount).fill(0);
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
-      totalR += r;
-      totalG += g;
-      totalB += b;
-      const [, saturation, lightness] = rgbToHsl(r, g, b);
-      if (lightness > 0.08 && lightness < 0.95 && saturation > 0.1) {
-        const vibrancy = saturation * (1 - Math.abs(lightness - 0.5) * 1.5);
-        const weight = Math.max(0.01, vibrancy * vibrancy);
-        weightedR += r * weight;
-        weightedG += g * weight;
-        weightedB += b * weight;
-        totalWeight += weight;
-      }
+      const [hue, saturation, lightness] = rgbToHsl(r, g, b);
+      if (lightness < 0.1 || lightness > 0.95 || saturation < 0.2) continue;
+      const weight = saturation * (1 - Math.abs(lightness - 0.55) * 0.7);
+      const bucket = Math.min(bucketCount - 1, Math.floor(hue * bucketCount));
+      weights[bucket] += weight;
+      reds[bucket] += r * weight;
+      greens[bucket] += g * weight;
+      blues[bucket] += b * weight;
     }
-    let finalR = Math.round(totalWeight > 0.5 ? weightedR / totalWeight : totalR / count);
-    let finalG = Math.round(totalWeight > 0.5 ? weightedG / totalWeight : totalG / count);
-    let finalB = Math.round(totalWeight > 0.5 ? weightedB / totalWeight : totalB / count);
-    const [hue, saturation, lightness] = rgbToHsl(finalR, finalG, finalB);
-    if (saturation < 0.12) {
-      player.style.setProperty("--mp-accent-start", "rgb(30, 31, 34)");
-      player.style.setProperty("--mp-accent-mid", "rgb(44, 47, 52)");
-      player.style.setProperty("--mp-accent-end", "rgb(20, 22, 22)");
-      player.style.setProperty("--mp-accent-solid", "#3a4145");
-      return;
+    const candidates = [];
+    for (let bucket = 0; bucket < bucketCount; bucket += 1) {
+      if (weights[bucket] <= 0) continue;
+      const r = Math.round(reds[bucket] / weights[bucket]);
+      const g = Math.round(greens[bucket] / weights[bucket]);
+      const b = Math.round(blues[bucket] / weights[bucket]);
+      const [hue, saturation, lightness] = rgbToHsl(r, g, b);
+      candidates.push({ hue, saturation, lightness, weight: weights[bucket] });
     }
-    const solidL = Math.max(0.65, Math.min(0.82, lightness < 0.45 ? 0.7 : lightness));
-    const solidS = Math.max(0.7, saturation);
-    const [solidR, solidG, solidB] = hslToRgb(hue, solidS, solidL);
-    const midS = Math.max(0.65, saturation * 0.85);
-    const midL = Math.max(0.48, lightness * 0.72);
-    const [midR, midG, midB] = hslToRgb((hue + 0.11) % 1, midS, midL);
-    const softS = Math.max(0.35, saturation * 0.55);
-    const softL = Math.max(0.28, lightness * 0.55);
-    const [softR, softG, softB] = hslToRgb(hue, softS, softL);
-    player.style.setProperty("--mp-accent-start", `rgb(${solidR}, ${solidG}, ${solidB})`);
-    player.style.setProperty("--mp-accent-mid", `rgb(${midR}, ${midG}, ${midB})`);
-    player.style.setProperty("--mp-accent-end", `rgb(${softR}, ${softG}, ${softB})`);
-    player.style.setProperty("--mp-accent-solid", `rgb(${solidR}, ${solidG}, ${solidB})`);
+    candidates.sort((first, second) => second.weight - first.weight);
+    const picked = [];
+    for (const candidate of candidates) {
+      const distinct = picked.every((item) => {
+        const distance = Math.abs(item.hue - candidate.hue);
+        return Math.min(distance, 1 - distance) > 0.1;
+      });
+      if (distinct) picked.push(candidate);
+      if (picked.length === 3) break;
+    }
+    if (!picked.length) return fallback();
+    picked.sort((first, second) => first.hue - second.hue);
+    const stops = picked.map(({ hue, saturation, lightness }) => {
+      const safeSaturation = Math.max(0.55, saturation);
+      const safeLightness = Math.min(0.82, Math.max(0.48, lightness));
+      const [r, g, b] = hslToRgb(hue, safeSaturation, safeLightness);
+      return `rgb(${r}, ${g}, ${b})`;
+    });
+    while (stops.length < 3) stops.push(stops[0]);
+    player.style.setProperty("--mp-accent-start", stops[0]);
+    player.style.setProperty("--mp-accent-mid", stops[1]);
+    player.style.setProperty("--mp-accent-end", stops[2]);
+    player.style.setProperty("--mp-accent-solid", stops[0]);
   } catch (_) {
-    player.style.setProperty("--mp-accent-start", "rgb(30, 31, 34)");
-    player.style.setProperty("--mp-accent-mid", "rgb(44, 47, 52)");
-    player.style.setProperty("--mp-accent-end", "rgb(20, 22, 22)");
-    player.style.setProperty("--mp-accent-solid", "#3a4145");
+    fallback();
   }
 }
 
