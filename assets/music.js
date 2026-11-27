@@ -1,7 +1,5 @@
 const AUDIO_BASE = "assets/music/";
 const FALLBACK_COVER = "assets/logo.png";
-const REPEAT_MODES = ["off", "all", "one"];
-const PLAYBACK_RATES = [1, 1.25, 1.5, 2];
 const VISIT_KEY = "zr_soundtrack_visited_v1";
 const FIRST_TRACK_FILE = "colors-flow.mp3";
 const DEFAULT_VOLUME = 0.8;
@@ -17,9 +15,8 @@ const ICONS = {
   mute: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.6 3 2.2-2.2-1.4-1.4-2.2 2.2-2.2-2.2-1.4 1.4 2.2 2.2-2.2 2.2 1.4 1.4 2.2-2.2 2.2 2.2 1.4-1.4-2.2-2.2z"/></svg>',
   heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 20.5S4.5 16 4.5 10.8A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16 12 20.5 12 20.5z"/></svg>',
   heartFill: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5S4.5 16 4.5 10.8A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16 12 20.5 12 20.5z"/></svg>',
-  speed: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM10 8v8l6-4-6-4z"/></svg>',
-  open: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 5h5V3H3v7h2V5zm9-2v2h5v5h2V3h-7zm5 14v5h-5v2h7v-7h-2zM3 14v7h7v-2H5v-5H3z"/></svg>',
   queue: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 6h11v2H4V6zm0 5h11v2H4v-2zm0 5h7v2H4v-2zm13-9v10.5a3.5 3.5 0 1 0 2 3.16V10h3V7h-5z"/></svg>',
+  grip: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="5" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="9" cy="19" r="1.4"/><circle cx="15" cy="5" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="15" cy="19" r="1.4"/></svg>',
 };
 
 const audio = document.getElementById("mp-audio");
@@ -30,9 +27,7 @@ const artistNode = document.getElementById("mp-artist");
 const playButton = document.getElementById("mp-play");
 const previousButton = document.getElementById("mp-prev");
 const nextButton = document.getElementById("mp-next");
-const shuffleButton = document.getElementById("mp-shuffle");
-const repeatButton = document.getElementById("mp-repeat");
-const speedButton = document.getElementById("mp-speed");
+const modeButton = document.getElementById("mp-mode");
 const seekInput = document.getElementById("mp-seek");
 const currentNode = document.getElementById("mp-current");
 const durationNode = document.getElementById("mp-duration");
@@ -44,21 +39,25 @@ const volumePercent = document.getElementById("mp-volume-percent");
 const popupMuteButton = document.getElementById("mp-popup-mute");
 const unmuteButton = document.getElementById("mp-unmute");
 const likeButton = document.getElementById("mp-like");
-const openButton = document.getElementById("mp-open");
 const queueButton = document.getElementById("mp-queue");
+const queuePopup = document.getElementById("mp-queue-popup");
+const queueList = document.getElementById("mp-queue-list");
+const queueCount = document.getElementById("mp-queue-count");
 const trackList = document.getElementById("track-list");
 
 let tracks = [];
 let currentIndex = 0;
-let shuffle = false;
-let repeatModeIndex = 0;
-let rateIndex = 0;
+let playbackMode = "shuffle";
 let lastVolume = DEFAULT_VOLUME;
-let autoplayBlocked = true;
+let autoplayBlocked = false;
 let seeking = false;
 let resumeAfterSeek = false;
 let volumePinned = false;
 let volumeCloseTimer = null;
+let queuePinned = false;
+let queueCloseTimer = null;
+let draggedIndex = null;
+const durations = new Map();
 
 function readStorage(key) {
   try {
@@ -217,17 +216,13 @@ function updatePlayIcon() {
   setIcon(playButton, playing ? "pause" : "play", playing ? "Pause" : "Play");
 }
 
-function updateShuffleIcon() {
-  setIcon(shuffleButton, "shuffle", shuffle ? "Shuffle on" : "Shuffle off");
-  shuffleButton.classList.toggle("active", shuffle);
-}
-
-function updateRepeatIcon() {
-  const mode = REPEAT_MODES[repeatModeIndex];
-  repeatButton.innerHTML = `${ICONS.repeat}${mode === "one" ? '<span class="mp-one">1</span>' : ""}`;
-  repeatButton.classList.toggle("active", mode !== "off");
-  repeatButton.setAttribute("aria-label", `Repeat ${mode}`);
-  repeatButton.title = `Repeat ${mode}`;
+function updateModeIcon() {
+  const random = playbackMode === "shuffle";
+  const label = random ? "Random soundtrack" : "Loop soundtrack";
+  setIcon(modeButton, random ? "shuffle" : "repeat", label);
+  modeButton.title = label;
+  modeButton.classList.add("active");
+  modeButton.setAttribute("aria-pressed", String(random));
 }
 
 function updateVolumeIcons() {
@@ -270,8 +265,8 @@ function updateLikeButton(track) {
 }
 
 function updateActiveRow() {
-  if (!trackList) return;
-  trackList.querySelectorAll(".track-row").forEach((row, index) => {
+  document.querySelectorAll(".track-row, .mp-queue-row").forEach((row) => {
+    const index = Number(row.dataset.index);
     row.classList.toggle("active", index === currentIndex);
   });
 }
@@ -288,22 +283,30 @@ function updateSeekVisual() {
   durationNode.textContent = formatTime(duration);
 }
 
-function updateSpeedIcon() {
-  const rate = PLAYBACK_RATES[rateIndex];
-  setIcon(speedButton, "speed", `Playback speed ${rate}x`);
-  speedButton.title = `Playback speed: ${rate}x`;
-}
-
 function startAutoplay() {
-  audio.muted = true;
-  audio.defaultMuted = true;
-  audio.volume = 0;
-  autoplayBlocked = true;
+  audio.muted = false;
+  audio.defaultMuted = false;
+  audio.volume = lastVolume || DEFAULT_VOLUME;
+  autoplayBlocked = false;
   updateVolumeVisual();
 
+  let attempted = false;
   const attempt = () => {
-    const result = audio.play();
-    if (result && typeof result.catch === "function") result.catch(() => {});
+    if (attempted) return;
+    attempted = true;
+    audio.play().then(() => {
+      autoplayBlocked = false;
+      updateVolumeVisual();
+      updatePlayIcon();
+    }).catch(() => {
+      autoplayBlocked = true;
+      audio.muted = true;
+      audio.defaultMuted = true;
+      audio.volume = 0;
+      audio.play().catch(() => {});
+      updateVolumeVisual();
+      updatePlayIcon();
+    });
   };
 
   if (audio.readyState >= 2) attempt();
@@ -360,29 +363,40 @@ function selectTrack(index, autoplay = false) {
   if (autoplay) playAudio();
 }
 
+function shuffleOrder() {
+  for (let i = tracks.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [tracks[i], tracks[j]] = [tracks[j], tracks[i]];
+  }
+}
+
 function nextIndex(direction) {
-  if (shuffle && tracks.length > 1) {
+  if (playbackMode === "shuffle" && tracks.length > 1) {
     let candidate = currentIndex;
-    while (candidate === currentIndex) {
-      candidate = Math.floor(Math.random() * tracks.length);
-    }
+    while (candidate === currentIndex) candidate = Math.floor(Math.random() * tracks.length);
     return candidate;
   }
   return (currentIndex + direction + tracks.length) % tracks.length;
 }
 
 function handleEnded() {
-  const mode = REPEAT_MODES[repeatModeIndex];
-  if (mode === "one") {
-    audio.currentTime = 0;
-    playAudio();
-    return;
-  }
-  if (currentIndex === tracks.length - 1 && mode === "off") {
-    updatePlayIcon();
-    return;
-  }
   selectTrack(nextIndex(1), true);
+}
+
+function reorderTrack(from, to) {
+  if (from === null || from === to || from < 0 || to < 0 || from >= tracks.length || to >= tracks.length) return;
+  const [moved] = tracks.splice(from, 1);
+  tracks.splice(to, 0, moved);
+  if (from === currentIndex) currentIndex = to;
+  else if (from < currentIndex && to >= currentIndex) currentIndex -= 1;
+  else if (from > currentIndex && to <= currentIndex) currentIndex += 1;
+  buildTrackList();
+  buildQueueList();
+}
+
+function clearDragMarks() {
+  if (!queueList) return;
+  queueList.querySelectorAll(".mp-queue-row").forEach((row) => row.classList.remove("dragging", "drag-over"));
 }
 
 function buildTrackList() {
@@ -392,6 +406,7 @@ function buildTrackList() {
     const row = document.createElement("button");
     row.type = "button";
     row.className = "track-row";
+    row.dataset.index = String(index);
     row.setAttribute("aria-label", `Play ${track.title} by ${track.artist}`);
 
     const image = document.createElement("img");
@@ -415,8 +430,108 @@ function buildTrackList() {
   updateActiveRow();
 }
 
-function initialTrackIndex() {
-  if (isFirstVisit()) {
+function updateQueueDurations() {
+  if (!queueList) return;
+  queueList.querySelectorAll(".mp-queue-row").forEach((row, index) => {
+    const node = row.querySelector(".mp-queue-duration");
+    const track = tracks[index];
+    if (node && track) node.textContent = formatTime(durations.get(track.file) || 0);
+  });
+}
+
+function buildQueueList() {
+  if (!queueList) return;
+  queueList.textContent = "";
+  tracks.forEach((track, index) => {
+    const row = document.createElement("div");
+    row.className = "mp-queue-row";
+    row.draggable = true;
+    row.dataset.index = String(index);
+
+    const grip = document.createElement("span");
+    grip.className = "mp-queue-grip";
+    grip.innerHTML = ICONS.grip;
+    grip.setAttribute("aria-hidden", "true");
+
+    const image = document.createElement("img");
+    image.src = coverSource(track);
+    image.alt = "";
+    image.loading = "lazy";
+    image.onerror = () => { image.src = FALLBACK_COVER; };
+
+    const copy = document.createElement("span");
+    copy.className = "mp-queue-copy";
+    const name = document.createElement("strong");
+    name.textContent = track.title;
+    const artist = document.createElement("span");
+    artist.textContent = track.artist;
+    copy.append(name, artist);
+
+    const duration = document.createElement("span");
+    duration.className = "mp-queue-duration";
+    duration.textContent = formatTime(durations.get(track.file) || 0);
+
+    row.append(grip, image, copy, duration);
+    row.addEventListener("click", () => {
+      selectTrack(index, true);
+      closeQueuePopup(true);
+    });
+    row.addEventListener("dragstart", (event) => {
+      draggedIndex = index;
+      row.classList.add("dragging");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", String(index));
+    });
+    row.addEventListener("dragend", () => {
+      row.classList.remove("dragging");
+      clearDragMarks();
+      draggedIndex = null;
+    });
+    row.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      row.classList.add("drag-over");
+    });
+    row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+    row.addEventListener("drop", (event) => {
+      event.preventDefault();
+      const from = draggedIndex === null ? Number(event.dataTransfer.getData("text/plain")) : draggedIndex;
+      clearDragMarks();
+      draggedIndex = null;
+      reorderTrack(from, index);
+    });
+    queueList.append(row);
+  });
+  if (queueCount) queueCount.textContent = `${tracks.length} tracks`;
+  updateActiveRow();
+}
+
+async function loadDurations() {
+  await Promise.all(tracks.map((track) => new Promise((resolve) => {
+    if (durations.has(track.file)) {
+      resolve();
+      return;
+    }
+    const probe = new Audio();
+    probe.preload = "metadata";
+    let finished = false;
+    const finish = (value) => {
+      if (finished) return;
+      finished = true;
+      durations.set(track.file, value);
+      updateQueueDurations();
+      probe.removeAttribute("src");
+      resolve();
+    };
+    probe.addEventListener("loadedmetadata", () => finish(Number.isFinite(probe.duration) ? probe.duration : 0), { once: true });
+    probe.addEventListener("error", () => finish(0), { once: true });
+    probe.src = `${AUDIO_BASE}${track.file}`;
+    probe.load();
+    window.setTimeout(() => finish(0), 5000);
+  })));
+}
+
+function initialTrackIndex(firstVisit) {
+  if (firstVisit) {
     const index = tracks.findIndex((track) => track.file === FIRST_TRACK_FILE);
     return index >= 0 ? index : 0;
   }
@@ -432,10 +547,12 @@ async function loadTracks() {
     const data = await response.json();
     tracks = Array.isArray(data.tracks) ? data.tracks : [];
     if (!tracks.length) throw new Error("No tracks available");
-    shuffle = !firstVisit;
-    updateShuffleIcon();
+    shuffleOrder();
+    playbackMode = "shuffle";
+    updateModeIcon();
     buildTrackList();
-    selectTrack(initialTrackIndex(), false);
+    buildQueueList();
+    selectTrack(initialTrackIndex(firstVisit), false);
     startAutoplay();
   } catch (_) {
     if (titleNode) titleNode.textContent = "Soundtrack unavailable";
@@ -459,21 +576,61 @@ function clearVolumeCloseTimer() {
   }
 }
 
-function openVolumePopup() {
+function openVolumePopup(force = false) {
   clearVolumeCloseTimer();
-  if (volumePopup) volumePopup.hidden = false;
+  if (!force) closeQueuePopup(true);
+  if (volumePopup) {
+    volumePopup.classList.add("open");
+    volumePopup.setAttribute("aria-hidden", "false");
+  }
   if (volumeToggle) volumeToggle.setAttribute("aria-expanded", "true");
 }
 
-function closeVolumePopup() {
-  if (volumePinned) return;
-  if (volumePopup) volumePopup.hidden = true;
+function closeVolumePopup(force = false) {
+  if (volumePinned && !force) return;
+  if (volumePopup) {
+    volumePopup.classList.remove("open");
+    volumePopup.setAttribute("aria-hidden", "true");
+  }
   if (volumeToggle) volumeToggle.setAttribute("aria-expanded", "false");
 }
 
 function scheduleVolumeClose() {
   clearVolumeCloseTimer();
-  volumeCloseTimer = window.setTimeout(closeVolumePopup, 320);
+  volumeCloseTimer = window.setTimeout(() => closeVolumePopup(), 320);
+}
+
+function clearQueueCloseTimer() {
+  if (queueCloseTimer !== null) {
+    window.clearTimeout(queueCloseTimer);
+    queueCloseTimer = null;
+  }
+}
+
+function openQueuePopup(force = false) {
+  clearQueueCloseTimer();
+  if (!force) closeVolumePopup(true);
+  buildQueueList();
+  if (queuePopup) {
+    queuePopup.classList.add("open");
+    queuePopup.setAttribute("aria-hidden", "false");
+  }
+  if (queueButton) queueButton.setAttribute("aria-expanded", "true");
+  loadDurations();
+}
+
+function closeQueuePopup(force = false) {
+  if (queuePinned && !force) return;
+  if (queuePopup) {
+    queuePopup.classList.remove("open");
+    queuePopup.setAttribute("aria-hidden", "true");
+  }
+  if (queueButton) queueButton.setAttribute("aria-expanded", "false");
+}
+
+function scheduleQueueClose() {
+  clearQueueCloseTimer();
+  queueCloseTimer = window.setTimeout(() => closeQueuePopup(), 360);
 }
 
 function levelFromPointer(event) {
@@ -488,7 +645,7 @@ function startVolumeDrag(event) {
   event.preventDefault();
   event.stopPropagation();
   volumePinned = true;
-  openVolumePopup();
+  openVolumePopup(true);
   setVolume(levelFromPointer(event));
 
   const move = (moveEvent) => setVolume(levelFromPointer(moveEvent));
@@ -504,49 +661,21 @@ function startVolumeDrag(event) {
   window.addEventListener("pointercancel", stop);
 }
 
-function scrollToSoundtrack() {
-  const target = document.getElementById("soundtrack");
-  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function scrollToQueue() {
-  const target = document.getElementById("track-list");
-  if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
 updatePlayIcon();
-updateShuffleIcon();
-updateRepeatIcon();
-updateSpeedIcon();
+updateModeIcon();
 setIcon(previousButton, "previous", "Previous track");
 setIcon(nextButton, "next", "Next track");
-setIcon(openButton, "open", "Open player");
-setIcon(queueButton, "queue", "Queue");
+setIcon(queueButton, "queue", "Open queue");
 updateVolumeVisual();
 
 if (playButton) playButton.addEventListener("click", togglePlay);
 if (previousButton) previousButton.addEventListener("click", () => selectTrack(nextIndex(-1), true));
 if (nextButton) nextButton.addEventListener("click", () => selectTrack(nextIndex(1), true));
 
-if (shuffleButton) {
-  shuffleButton.addEventListener("click", () => {
-    shuffle = !shuffle;
-    updateShuffleIcon();
-  });
-}
-
-if (repeatButton) {
-  repeatButton.addEventListener("click", () => {
-    repeatModeIndex = (repeatModeIndex + 1) % REPEAT_MODES.length;
-    updateRepeatIcon();
-  });
-}
-
-if (speedButton) {
-  speedButton.addEventListener("click", () => {
-    rateIndex = (rateIndex + 1) % PLAYBACK_RATES.length;
-    audio.playbackRate = PLAYBACK_RATES[rateIndex];
-    updateSpeedIcon();
+if (modeButton) {
+  modeButton.addEventListener("click", () => {
+    playbackMode = playbackMode === "shuffle" ? "loop" : "shuffle";
+    updateModeIcon();
   });
 }
 
@@ -587,20 +716,20 @@ if (seekInput) {
 
 if (volumeToggle) {
   volumeToggle.addEventListener("click", () => {
-    if (volumePopup && !volumePopup.hidden && volumePinned) {
+    if (volumePopup && volumePopup.classList.contains("open") && volumePinned) {
       volumePinned = false;
-      closeVolumePopup();
+      closeVolumePopup(true);
     } else {
       volumePinned = true;
-      openVolumePopup();
+      openVolumePopup(true);
     }
   });
-  volumeToggle.addEventListener("pointerenter", openVolumePopup);
+  volumeToggle.addEventListener("pointerenter", () => openVolumePopup());
   volumeToggle.addEventListener("pointerleave", scheduleVolumeClose);
 }
 
 if (volumePopup) {
-  volumePopup.addEventListener("pointerenter", openVolumePopup);
+  volumePopup.addEventListener("pointerenter", () => openVolumePopup(true));
   volumePopup.addEventListener("pointerleave", scheduleVolumeClose);
   volumePopup.addEventListener("wheel", (event) => {
     event.preventDefault();
@@ -641,10 +770,23 @@ if (likeButton) {
   });
 }
 
-if (openButton) openButton.addEventListener("click", scrollToSoundtrack);
 if (queueButton) {
-  if (!trackList) queueButton.hidden = true;
-  else queueButton.addEventListener("click", scrollToQueue);
+  queueButton.addEventListener("click", () => {
+    if (queuePopup && queuePopup.classList.contains("open") && queuePinned) {
+      queuePinned = false;
+      closeQueuePopup(true);
+    } else {
+      queuePinned = true;
+      openQueuePopup(true);
+    }
+  });
+  queueButton.addEventListener("pointerenter", () => openQueuePopup());
+  queueButton.addEventListener("pointerleave", scheduleQueueClose);
+}
+
+if (queuePopup) {
+  queuePopup.addEventListener("pointerenter", () => openQueuePopup(true));
+  queuePopup.addEventListener("pointerleave", scheduleQueueClose);
 }
 
 audio.addEventListener("play", updatePlayIcon);
@@ -667,12 +809,15 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-document.addEventListener("pointerdown", () => {
+document.addEventListener("pointerdown", (event) => {
   if (autoplayBlocked) enableSound();
+  if (queuePopup && queuePopup.classList.contains("open") && !queuePinned && !queuePopup.contains(event.target) && !queueButton.contains(event.target)) closeQueuePopup(true);
+  if (volumePopup && volumePopup.classList.contains("open") && !volumePinned && !volumePopup.contains(event.target) && !volumeToggle.contains(event.target)) closeVolumePopup(true);
 });
 
 if (player) player.classList.add("ready");
-audio.volume = DEFAULT_VOLUME;
-audio.muted = true;
+audio.volume = lastVolume;
+audio.muted = false;
+audio.defaultMuted = false;
 updateVolumeVisual();
 loadTracks();
