@@ -15,7 +15,7 @@ const ICONS = {
   mute: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.6 3 2.2-2.2-1.4-1.4-2.2 2.2-2.2-2.2-1.4 1.4 2.2 2.2-2.2 2.2 1.4 1.4 2.2-2.2 2.2 2.2 1.4-1.4-2.2-2.2z"/></svg>',
   heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 20.5S4.5 16 4.5 10.8A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16 12 20.5 12 20.5z"/></svg>',
   heartFill: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5S4.5 16 4.5 10.8A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16 12 20.5 12 20.5z"/></svg>',
-  queue: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 6h11v2H4V6zm0 5h11v2H4v-2zm0 5h7v2H4v-2zm13-9v10.5a3.5 3.5 0 1 0 2 3.16V10h3V7h-5z"/></svg>',
+  queue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15V6l-6 3V3"/><path d="M3 6h12"/><path d="M3 12h8"/><path d="M3 18h8"/><circle cx="18" cy="18" r="3"/></svg>',
   grip: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="5" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="9" cy="19" r="1.4"/><circle cx="15" cy="5" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="15" cy="19" r="1.4"/></svg>',
 };
 
@@ -37,7 +37,6 @@ const volumeTrack = document.getElementById("mp-volume-track");
 const volumeFill = document.getElementById("mp-volume-fill");
 const volumePercent = document.getElementById("mp-volume-percent");
 const popupMuteButton = document.getElementById("mp-popup-mute");
-const unmuteButton = document.getElementById("mp-unmute");
 const likeButton = document.getElementById("mp-like");
 const queueButton = document.getElementById("mp-queue");
 const queuePopup = document.getElementById("mp-queue-popup");
@@ -53,6 +52,7 @@ let autoplayBlocked = false;
 let seeking = false;
 let resumeAfterSeek = false;
 let volumePinned = false;
+let suppressVolumeHover = false;
 let volumeCloseTimer = null;
 let queuePinned = false;
 let queueCloseTimer = null;
@@ -230,7 +230,6 @@ function updateVolumeIcons() {
   const icon = muted ? "mute" : "volume";
   setIcon(volumeToggle, icon, muted ? "Unmute" : "Volume");
   setIcon(popupMuteButton, icon, muted ? "Unmute" : "Mute");
-  if (unmuteButton) unmuteButton.classList.toggle("visible", autoplayBlocked);
 }
 
 function updateVolumeVisual() {
@@ -271,21 +270,31 @@ function updateActiveRow() {
   });
 }
 
+function setProgress(value) {
+  const clamped = Math.min(100, Math.max(0, value));
+  if (seekInput) {
+    seekInput.value = String(clamped);
+    seekInput.style.setProperty("--progress", `${clamped}%`);
+  }
+  if (player) {
+    player.style.setProperty("--mp-progress-scale", String(clamped / 100));
+    player.classList.toggle("full-progress", clamped >= 99.5);
+  }
+}
+
 function updateSeekVisual() {
   const duration = audio.duration;
   const value = Number.isFinite(duration) && duration > 0
     ? (audio.currentTime / duration) * 100
     : 0;
-  seekInput.value = String(value);
-  seekInput.style.setProperty("--progress", `${value}%`);
-  if (player) player.style.setProperty("--mp-progress-scale", String(value / 100));
+  setProgress(value);
   currentNode.textContent = formatTime(audio.currentTime);
   durationNode.textContent = formatTime(duration);
 }
 
 function startAutoplay() {
-  audio.muted = false;
-  audio.defaultMuted = false;
+  audio.muted = true;
+  audio.defaultMuted = true;
   audio.volume = lastVolume || DEFAULT_VOLUME;
   autoplayBlocked = false;
   updateVolumeVisual();
@@ -295,14 +304,18 @@ function startAutoplay() {
     if (attempted) return;
     attempted = true;
     audio.play().then(() => {
-      autoplayBlocked = false;
-      updateVolumeVisual();
-      updatePlayIcon();
+      const unmute = () => {
+        audio.muted = false;
+        audio.defaultMuted = false;
+        audio.volume = lastVolume || DEFAULT_VOLUME;
+        autoplayBlocked = false;
+        updateVolumeVisual();
+        updatePlayIcon();
+      };
+      window.setTimeout(unmute, 0);
+      if (audio.readyState < 2) audio.addEventListener("loadeddata", unmute, { once: true });
     }).catch(() => {
       autoplayBlocked = true;
-      audio.muted = true;
-      audio.defaultMuted = true;
-      audio.volume = 0;
       audio.play().catch(() => {});
       updateVolumeVisual();
       updatePlayIcon();
@@ -316,6 +329,23 @@ function startAutoplay() {
   }
   audio.load();
 }
+
+function primeAudio() {
+  if (!audio.paused && !audio.muted) return;
+  audio.muted = false;
+  audio.defaultMuted = false;
+  audio.volume = lastVolume || DEFAULT_VOLUME;
+  autoplayBlocked = false;
+  updateVolumeVisual();
+  if (audio.paused && audio.src) playAudio();
+}
+
+["pointerdown", "keydown", "touchstart", "wheel", "scroll"].forEach((eventName) => {
+  document.addEventListener(eventName, primeAudio, { passive: true });
+});
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) primeAudio();
+});
 
 async function playAudio() {
   try {
@@ -384,19 +414,25 @@ function handleEnded() {
 }
 
 function reorderTrack(from, to) {
-  if (from === null || from === to || from < 0 || to < 0 || from >= tracks.length || to >= tracks.length) return;
+  if (from === null || from < 0 || to < 0 || from >= tracks.length || to > tracks.length) return;
+  const currentTrack = tracks[currentIndex];
   const [moved] = tracks.splice(from, 1);
-  tracks.splice(to, 0, moved);
-  if (from === currentIndex) currentIndex = to;
-  else if (from < currentIndex && to >= currentIndex) currentIndex -= 1;
-  else if (from > currentIndex && to <= currentIndex) currentIndex += 1;
+  const target = to > from ? to - 1 : to;
+  tracks.splice(Math.min(target, tracks.length), 0, moved);
+  currentIndex = Math.max(0, tracks.indexOf(currentTrack));
   buildTrackList();
   buildQueueList();
 }
 
+function clearDropMarks() {
+  if (!queueList) return;
+  queueList.querySelectorAll(".mp-queue-row").forEach((row) => row.classList.remove("drop-before", "drop-after"));
+}
+
 function clearDragMarks() {
   if (!queueList) return;
-  queueList.querySelectorAll(".mp-queue-row").forEach((row) => row.classList.remove("dragging", "drag-over"));
+  queueList.classList.remove("dragging");
+  queueList.querySelectorAll(".mp-queue-row").forEach((row) => row.classList.remove("dragging", "drop-before", "drop-after"));
 }
 
 function buildTrackList() {
@@ -478,26 +514,32 @@ function buildQueueList() {
     });
     row.addEventListener("dragstart", (event) => {
       draggedIndex = index;
+      queueList.classList.add("dragging");
       row.classList.add("dragging");
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", String(index));
     });
     row.addEventListener("dragend", () => {
-      row.classList.remove("dragging");
       clearDragMarks();
       draggedIndex = null;
     });
     row.addEventListener("dragover", (event) => {
       event.preventDefault();
-      row.classList.add("drag-over");
+      event.dataTransfer.dropEffect = "move";
+      const rect = row.getBoundingClientRect();
+      const before = event.clientY < rect.top + rect.height / 2;
+      clearDropMarks();
+      row.classList.add(before ? "drop-before" : "drop-after");
     });
-    row.addEventListener("dragleave", () => row.classList.remove("drag-over"));
+    row.addEventListener("dragleave", clearDropMarks);
     row.addEventListener("drop", (event) => {
       event.preventDefault();
       const from = draggedIndex === null ? Number(event.dataTransfer.getData("text/plain")) : draggedIndex;
+      const target = Number(row.dataset.index);
+      const insertion = row.classList.contains("drop-before") ? target : target + 1;
       clearDragMarks();
       draggedIndex = null;
-      reorderTrack(from, index);
+      reorderTrack(from, insertion);
     });
     queueList.append(row);
   });
@@ -558,15 +600,6 @@ async function loadTracks() {
     if (titleNode) titleNode.textContent = "Soundtrack unavailable";
     if (artistNode) artistNode.textContent = "Track list could not be loaded";
   }
-}
-
-function enableSound() {
-  autoplayBlocked = false;
-  audio.muted = false;
-  audio.defaultMuted = false;
-  audio.volume = lastVolume || DEFAULT_VOLUME;
-  updateVolumeVisual();
-  if (audio.paused) playAudio();
 }
 
 function clearVolumeCloseTimer() {
@@ -694,8 +727,7 @@ if (seekInput) {
 
   seekInput.addEventListener("input", () => {
     const value = Number(seekInput.value);
-    seekInput.style.setProperty("--progress", `${value}%`);
-    if (player) player.style.setProperty("--mp-progress-scale", String(value / 100));
+    setProgress(value);
     if (!seeking) applySeek();
   });
 
@@ -715,17 +747,26 @@ if (seekInput) {
 }
 
 if (volumeToggle) {
-  volumeToggle.addEventListener("click", () => {
-    if (volumePopup && volumePopup.classList.contains("open") && volumePinned) {
+  volumeToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const open = Boolean(volumePopup && volumePopup.classList.contains("open"));
+    if (open) {
       volumePinned = false;
+      suppressVolumeHover = true;
       closeVolumePopup(true);
     } else {
       volumePinned = true;
+      suppressVolumeHover = false;
       openVolumePopup(true);
     }
   });
-  volumeToggle.addEventListener("pointerenter", () => openVolumePopup());
-  volumeToggle.addEventListener("pointerleave", scheduleVolumeClose);
+  volumeToggle.addEventListener("pointerenter", () => {
+    if (!suppressVolumeHover) openVolumePopup();
+  });
+  volumeToggle.addEventListener("pointerleave", () => {
+    suppressVolumeHover = false;
+    scheduleVolumeClose();
+  });
 }
 
 if (volumePopup) {
@@ -757,8 +798,6 @@ if (volumeTrack) {
 }
 
 if (popupMuteButton) popupMuteButton.addEventListener("click", toggleMute);
-if (unmuteButton) unmuteButton.addEventListener("click", enableSound);
-
 if (likeButton) {
   likeButton.addEventListener("click", () => {
     const track = tracks[currentIndex];
@@ -771,8 +810,10 @@ if (likeButton) {
 }
 
 if (queueButton) {
-  queueButton.addEventListener("click", () => {
-    if (queuePopup && queuePopup.classList.contains("open") && queuePinned) {
+  queueButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const open = Boolean(queuePopup && queuePopup.classList.contains("open"));
+    if (open) {
       queuePinned = false;
       closeQueuePopup(true);
     } else {
@@ -810,7 +851,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("pointerdown", (event) => {
-  if (autoplayBlocked) enableSound();
+  primeAudio();
   if (queuePopup && queuePopup.classList.contains("open") && !queuePinned && !queuePopup.contains(event.target) && !queueButton.contains(event.target)) closeQueuePopup(true);
   if (volumePopup && volumePopup.classList.contains("open") && !volumePinned && !volumePopup.contains(event.target) && !volumeToggle.contains(event.target)) closeVolumePopup(true);
 });
