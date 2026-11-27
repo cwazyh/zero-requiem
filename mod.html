@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mod Panel — Zero://Requiem</title>
+  <meta name="application-name" content="Zero://Requiem">
+  <meta property="og:title" content="Mod Panel — Zero://Requiem">
+  <meta property="og:site_name" content="Zero://Requiem">
+  <link rel="canonical" href="https://cwazyh.github.io/zero-requiem/mod.html">
+  <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/mod.html">
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img src="assets/logo.png" alt="Zero://Requiem logo"><span>Zero://Requiem</span></div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="/auth/logout">Sign out</a>
+    </nav>
+  </header>
+
+  <main class="shell">
+    <h1>Mod Panel</h1>
+    <div class="userbar" id="userbar">
+      <div id="user-info">Checking session...</div>
+    </div>
+
+    <div id="denied" style="display:none">
+      <div class="card">
+        <h3>Access denied</h3>
+        <p id="denied-detail">You need Discord verification and an authorized staff role to view this panel.</p>
+        <div class="actions"><a class="btn primary" href="/auth/login">Sign in with Discord</a><a class="btn ghost" href="index.html">Back home</a></div>
+      </div>
+    </div>
+
+    <div id="panel" style="display:none">
+      <div class="tabs">
+        <button class="tab active" data-view="overview">Overview</button>
+        <button class="tab" data-view="cases">Case Files</button>
+        <button class="tab" data-view="logs">Logs Feed</button>
+        <button class="tab" data-view="config">Configuration</button>
+      </div>
+
+      <section class="view active" id="view-overview">
+        <div class="grid" id="metrics"></div>
+        <div class="card" style="margin-top:16px">
+          <h3>Latest deployment</h3>
+          <div class="kv" id="deploy-info"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-cases">
+        <div class="search">
+          <input id="case-query" type="search" placeholder="Search by Discord user ID or transcript text">
+          <button class="btn primary" id="case-search">Search</button>
+        </div>
+        <table><thead><tr><th>Case</th><th>User ID</th><th>Opened</th><th>Context</th></tr></thead><tbody id="cases-body"></tbody></table>
+      </section>
+
+      <section class="view" id="view-logs">
+        <div class="search">
+          <select id="log-category">
+            <option value="all">All available events</option>
+            <option value="ticket">Tickets</option>
+            <option value="case">Cases</option>
+            <option value="deploy">Deployments</option>
+          </select>
+        </div>
+        <table><thead><tr><th>When</th><th>Type</th><th>Event</th><th>Detail</th></tr></thead><tbody id="logs-body"></tbody></table>
+        <div class="notice">Moderation, message, server, and voice channel logs are not exposed through this data layer yet. Unavailable categories stay empty instead of showing stale data.</div>
+      </section>
+
+      <section class="view" id="view-config">
+        <div class="card"><div class="kv" id="config-info"></div></div>
+        <div class="notice">Access control is read-only in this base build. Action toggles can be added after the portal is confirmed in production.</div>
+      </section>
+    </div>
+  </main>
+
+  <footer>Zero://Requiem • Staff access is role-gated through Discord OAuth2</footer>
+  <script src="assets/config.js"></script>
+  <script src="assets/panel.js"></script>
+</body>
+</html>
