@@ -172,25 +172,25 @@ function applyCoverAccent(image) {
     let finalG = Math.round(totalWeight > 0.5 ? weightedG / totalWeight : totalG / count);
     let finalB = Math.round(totalWeight > 0.5 ? weightedB / totalWeight : totalB / count);
     const [hue, saturation, lightness] = rgbToHsl(finalR, finalG, finalB);
-    let solidR;
-    let solidG;
-    let solidB;
-    let accent;
     if (saturation < 0.12) {
-      [solidR, solidG, solidB] = [255, 255, 255];
-      accent = lightness < 0.5 ? "rgba(255, 255, 255, 0.14)" : "rgba(255, 255, 255, 0.09)";
-    } else {
-      const solidL = Math.max(0.65, Math.min(0.82, lightness < 0.45 ? 0.7 : lightness));
-      const solidS = Math.max(0.7, saturation);
-      [solidR, solidG, solidB] = hslToRgb(hue, solidS, solidL);
-      const bgOpacity = lightness < 0.25 ? 0.22 : lightness < 0.5 ? 0.18 : 0.12;
-      accent = `rgba(${solidR}, ${solidG}, ${solidB}, ${bgOpacity})`;
+      player.style.setProperty("--mp-accent-start", "rgba(30, 31, 34, 0.92)");
+      player.style.setProperty("--mp-accent-end", "rgba(20, 22, 22, 0.92)");
+      player.style.setProperty("--mp-accent-solid", "#3a4145");
+      return;
     }
-    player.style.setProperty("--mp-accent", accent);
+    const solidL = Math.max(0.65, Math.min(0.82, lightness < 0.45 ? 0.7 : lightness));
+    const solidS = Math.max(0.7, saturation);
+    const [solidR, solidG, solidB] = hslToRgb(hue, solidS, solidL);
+    const softS = Math.max(0.35, saturation * 0.55);
+    const softL = Math.max(0.28, lightness * 0.55);
+    const [softR, softG, softB] = hslToRgb(hue, softS, softL);
+    player.style.setProperty("--mp-accent-start", `rgba(${solidR}, ${solidG}, ${solidB}, 0.30)`);
+    player.style.setProperty("--mp-accent-end", `rgba(${softR}, ${softG}, ${softB}, 0.10)`);
     player.style.setProperty("--mp-accent-solid", `rgb(${solidR}, ${solidG}, ${solidB})`);
   } catch (_) {
-    player.style.setProperty("--mp-accent", "rgba(255, 255, 255, 0.12)");
-    player.style.setProperty("--mp-accent-solid", "rgb(255, 255, 255)");
+    player.style.setProperty("--mp-accent-start", "rgba(30, 31, 34, 0.92)");
+    player.style.setProperty("--mp-accent-end", "rgba(20, 22, 22, 0.92)");
+    player.style.setProperty("--mp-accent-solid", "#3a4145");
   }
 }
 
