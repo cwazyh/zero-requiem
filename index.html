@@ -11,8 +11,8 @@
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/">
   <meta name="description" content="Zero://Requiem — a private Discord community with Arthur, its moderation and support bot.">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style.css?v=35">
-  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=35">
+  <link rel="stylesheet" href="assets/style.css?v=36">
+  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=36">
 </head>
 <body>
   <div class="intro" id="intro" role="dialog" aria-label="Secure uplink">
@@ -26,16 +26,18 @@
     </div>
     <div class="intro-frame" aria-hidden="true"></div>
     <div class="intro-stage">
-      <div class="intro-core" aria-hidden="true">
-        <span class="intro-ring one"></span>
-        <span class="intro-ring two"></span>
-        <span class="intro-ring three"></span>
-        <img class="intro-logo" src="assets/logo.png" alt="">
-        <span class="intro-scan"></span>
-      </div>
+      <ag-glass class="intro-glass" variant="lens" tone="dark" params='{"blur":2,"zoom":1.25,"bezel":0.18,"maxBezel":24,"depth":0.9,"dispersion":0.01,"rim":1.2,"rimWidth":1.1}' aria-hidden="true">
+        <div class="intro-core">
+          <span class="intro-ring one"></span>
+          <span class="intro-ring two"></span>
+          <span class="intro-ring three"></span>
+          <img class="intro-logo" src="assets/logo.png" alt="">
+          <span class="intro-scan"></span>
+        </div>
+      </ag-glass>
       <p class="intro-kicker">Zero://Requiem</p>
       <h1 class="intro-title" data-text="SECURE UPLINK">SECURE UPLINK</h1>
-      <p class="intro-status" id="intro-status">HANDSHAKE // 00%</p>
+      <p class="intro-status" id="intro-status" data-text="HANDSHAKE // 00%">HANDSHAKE // 00%</p>
       <div class="intro-progress" aria-hidden="true"><span id="intro-progress-fill"></span></div>
       <button class="intro-access" id="intro-access" type="button" disabled>
         <span class="access-mark">//</span> ACCESS THE SITE <span class="access-arrow">→</span>
@@ -58,7 +60,7 @@
   </header>
 
   <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
-  <aside class="sidebar" id="sidebar" aria-hidden="true">
+  <ag-glass class="sidebar" id="sidebar" aria-hidden="true" variant="lens" tone="dark" params='{"blur":4,"zoom":1.2,"bezel":0.16,"maxBezel":24,"depth":0.7,"dispersion":0.006,"rim":1,"rimWidth":1}'>
     <div class="sidebar-head">
       <img src="assets/logo.png" alt="" class="sidebar-logo">
       <div><strong>Zero://Requiem</strong><span>Navigation</span></div>
@@ -82,12 +84,12 @@
       </div>
       <div id="sidebar-verify-slot"></div>
     </div>
-  </aside>
+  </ag-glass>
 
   <main class="hero">
     <section>
       <h1>Zero<span>://</span>Requiem</h1>
-      <p id="intro">A private Discord community built around clear rules, fast support, and a small staff team that actually shows up. Verify with Discord to unlock the server, or check the moderator area if you manage it.</p>
+      <p>A private Discord community built around clear rules, fast support, and a small staff team that actually shows up. Verify with Discord to unlock the server, or check the moderator area if you manage it.</p>
       <div class="actions">
         <a class="btn primary" id="discord-button" href="https://discord.gg/zkfc4kJHUV" target="_blank" rel="noopener noreferrer">Join Discord</a>
         <a class="btn" id="verify-button" href="https://discord.gg/zkfc4kJHUV" target="_blank" rel="noopener noreferrer">Verify with Discord</a>
@@ -228,8 +230,6 @@
       </div>
     </div>
     <div class="mp-tools">
-      <button id="mp-queue" type="button" aria-label="Open queue" aria-expanded="false"></button>
-      <span class="mp-tool-separator" aria-hidden="true"></span>
       <button id="mp-mode" type="button" aria-label="Random soundtrack" aria-pressed="true" title="Random soundtrack"></button>
       <div class="mp-volume-wrap">
         <button id="mp-volume" class="mp-volume-toggle" type="button" aria-label="Volume" aria-expanded="false"></button>
@@ -241,6 +241,8 @@
           <button id="mp-popup-mute" type="button" aria-label="Mute"></button>
         </div>
       </div>
+      <span class="mp-tool-separator" aria-hidden="true"></span>
+      <button id="mp-queue" type="button" aria-label="Open queue" aria-expanded="false"></button>
     </div>
     <div class="mp-queue-popup" id="mp-queue-popup" aria-hidden="true">
       <div class="mp-queue-head"><strong>Queue</strong><span id="mp-queue-count">0 tracks</span></div>
@@ -249,11 +251,11 @@
     <audio id="mp-audio" preload="auto" playsinline></audio>
   </ag-glass>
 
-  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=35"></script>
-  <script src="assets/config.js?v=35"></script>
-  <script src="assets/home.js?v=35"></script>
-  <script src="assets/profile.js?v=35"></script>
-  <script src="assets/music.js?v=35"></script>
-  <script src="assets/intro.js?v=35"></script>
+  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=36"></script>
+  <script src="assets/config.js?v=36"></script>
+  <script src="assets/home.js?v=36"></script>
+  <script src="assets/profile.js?v=36"></script>
+  <script src="assets/music.js?v=36"></script>
+  <script src="assets/intro.js?v=36"></script>
 </body>
 </html>
