@@ -11,7 +11,7 @@
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/">
   <meta name="description" content="Zero://Requiem — a private Discord community with Arthur, its moderation and support bot.">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/style.css?v=22">
 </head>
 <body>
   <header class="topbar">
@@ -42,7 +42,7 @@
       <a href="mod.html" id="sidebar-mod-link">Mod Panel</a>
     </nav>
     <div class="sidebar-foot">
-      <div class="profile-card" id="profile-card">
+      <div class="profile-card" id="profile-card" data-profile-trigger>
         <div class="avatar-wrap"><img id="profile-avatar" src="assets/logo.png" alt=""><span class="status-dot" id="profile-status-dot"></span></div>
         <div class="profile-copy">
           <strong id="profile-name">Not signed in</strong>
@@ -182,7 +182,7 @@
   <div class="music-player" id="music-player">
     <div class="mp-track">
       <img id="mp-cover" src="assets/logo.png" alt="">
-      <div class="mp-meta"><strong id="mp-title">Soundtrack</strong><span id="mp-artist">Loading...</span></div>
+      <div class="mp-meta"><strong id="mp-title">COLORS</strong><span id="mp-artist">FLOW</span></div>
       <button id="mp-like" class="mp-like" type="button" aria-label="Add to favourites" aria-pressed="false">♡</button>
     </div>
     <div class="mp-center">
@@ -215,8 +215,9 @@
     <audio id="mp-audio" preload="metadata"></audio>
   </div>
 
-  <script src="assets/config.js"></script>
-  <script src="assets/home.js"></script>
-  <script src="assets/music.js"></script>
+  <script src="assets/config.js?v=22"></script>
+  <script src="assets/home.js?v=22"></script>
+  <script src="assets/profile.js?v=22"></script>
+  <script src="assets/music.js?v=22"></script>
 </body>
 </html>
