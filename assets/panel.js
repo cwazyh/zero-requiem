@@ -1,14 +1,17 @@
 const BASE = window.ZR_API_BASE || "";
+const FALLBACK_INVITE = "https://discord.gg/zkfc4kJHUV";
 const panel = document.getElementById("panel");
 const denied = document.getElementById("denied");
 const userInfo = document.getElementById("user-info");
 const deniedDetail = document.getElementById("denied-detail");
 
 document.querySelectorAll('a[href="/auth/logout"]').forEach((link) => {
-  link.href = `${BASE}/auth/logout`;
+  if (BASE) link.href = `${BASE}/auth/logout`;
+  else link.remove();
 });
 document.querySelectorAll('a[href="/auth/login"]').forEach((link) => {
-  link.href = `${BASE}/auth/login`;
+  link.href = BASE ? `${BASE}/auth/login` : FALLBACK_INVITE;
+  if (!BASE) link.textContent = "Open Discord";
 });
 
 function escapeHtml(value) {
@@ -39,6 +42,11 @@ function showDenied(message) {
 }
 
 async function loadSession() {
+  if (!BASE) {
+    userInfo.textContent = "OAuth backend is not connected.";
+    showDenied("Web sign-in needs the OAuth backend. Staff tools are available inside Discord for now.");
+    return;
+  }
   try {
     const me = await api("/api/me");
     if (!me.authenticated) {
