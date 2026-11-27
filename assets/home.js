@@ -3,10 +3,74 @@ const FALLBACK_INVITE = "https://discord.gg/zkfc4kJHUV";
 const discordButton = document.getElementById("discord-button");
 const verifyButton = document.getElementById("verify-button");
 const status = document.getElementById("verify-status");
+const brandMenu = document.getElementById("brand-menu");
+const sidebar = document.getElementById("sidebar");
+const sidebarScrim = document.getElementById("sidebar-scrim");
+const sidebarClose = document.getElementById("sidebar-close");
+const verifySlot = document.getElementById("sidebar-verify-slot");
+const profileAvatar = document.getElementById("profile-avatar");
+const profileName = document.getElementById("profile-name");
+const profileHandle = document.getElementById("profile-handle");
+const profileStatus = document.getElementById("profile-status");
+const statusDot = document.getElementById("profile-status-dot");
 
 discordButton.href = FALLBACK_INVITE;
-discordButton.removeAttribute("aria-disabled");
 verifyButton.href = BASE ? `${BASE}/auth/login` : FALLBACK_INVITE;
+
+function openSidebar() {
+  sidebar.classList.add("open");
+  sidebar.setAttribute("aria-hidden", "false");
+  brandMenu.setAttribute("aria-expanded", "true");
+  sidebarScrim.hidden = false;
+  requestAnimationFrame(() => sidebarScrim.classList.add("visible"));
+}
+
+function closeSidebar() {
+  sidebar.classList.remove("open");
+  sidebar.setAttribute("aria-hidden", "true");
+  brandMenu.setAttribute("aria-expanded", "false");
+  sidebarScrim.classList.remove("visible");
+  setTimeout(() => {
+    if (!sidebar.classList.contains("open")) sidebarScrim.hidden = true;
+  }, 280);
+}
+
+brandMenu.addEventListener("click", openSidebar);
+sidebarClose.addEventListener("click", closeSidebar);
+sidebarScrim.addEventListener("click", closeSidebar);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeSidebar();
+});
+sidebar.querySelectorAll(".sidebar-nav a").forEach((link) => {
+  link.addEventListener("click", closeSidebar);
+});
+
+function applyProfile(me) {
+  if (!me || !me.authenticated) {
+    profileAvatar.src = "assets/logo.png";
+    profileName.textContent = "Not signed in";
+    profileHandle.textContent = "Sign in with Discord to see your profile";
+    profileStatus.textContent = "";
+    statusDot.style.background = "#80848e";
+    return;
+  }
+  if (me.avatar_url) profileAvatar.src = me.avatar_url;
+  profileAvatar.onerror = () => { profileAvatar.src = "assets/logo.png"; };
+  profileName.textContent = me.display_name || me.username || "Discord user";
+  profileHandle.textContent = me.handle ? `@${me.handle} • ${me.id}` : me.id;
+  const custom = me.custom_status ? ` — ${me.custom_status}` : "";
+  profileStatus.textContent = `${me.status_label || "Offline"}${custom}`;
+  statusDot.style.background = me.status_color || "#80848e";
+}
+
+function placeVerifyButton(authenticated, allowed) {
+  if (authenticated && allowed) {
+    verifyButton.textContent = "Verified — Staff";
+    return;
+  }
+  verifySlot.appendChild(verifyButton);
+  verifyButton.textContent = "Verify with Discord";
+}
 
 async function loadPublicConfig() {
   if (!BASE) return;
@@ -21,18 +85,28 @@ async function loadPublicConfig() {
 }
 
 async function loadSession() {
-  if (!BASE) return;
+  if (!BASE) {
+    applyProfile(null);
+    placeVerifyButton(false, false);
+    status.textContent = "Web verification needs the OAuth backend. For now, join Discord and accept the rules in #rules.";
+    return;
+  }
   try {
     const response = await fetch(`${BASE}/api/me`, { credentials: "include" });
     if (!response.ok) return;
     const data = await response.json();
+    applyProfile(data);
+    placeVerifyButton(Boolean(data.authenticated), Boolean(data.allowed));
     if (data.authenticated) {
-      verifyButton.textContent = data.allowed ? "Verified — Staff" : "Verified — Member";
       status.textContent = data.allowed
-        ? `Signed in as ${data.username}. Mod Panel access is available.`
-        : `Signed in as ${data.username}. Staff role required for the Mod Panel.`;
+        ? `Signed in as ${data.display_name || data.username}. Mod Panel access is available.`
+        : `Signed in as ${data.display_name || data.username}. Staff role required for the Mod Panel.`;
+    } else {
+      status.textContent = "Verify with Discord to unlock the server and see your profile here.";
     }
   } catch (_) {
+    applyProfile(null);
+    placeVerifyButton(false, false);
     status.textContent = "Session status is currently unavailable.";
   }
 }
@@ -64,12 +138,7 @@ function setupRevealAnimations() {
   targets.forEach((element) => observer.observe(element));
 }
 
-if (BASE) {
-  loadPublicConfig();
-  loadSession();
-} else {
-  status.textContent = "Web verification needs the OAuth backend. For now, join Discord and accept the rules in #rules.";
-}
-
+loadPublicConfig();
+loadSession();
 document.documentElement.classList.add("js");
 setupRevealAnimations();
