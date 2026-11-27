@@ -40,7 +40,7 @@ GitHub Pages cannot run the OAuth token exchange or keep a client secret private
 
 `config.js` defaults to that origin and also accepts `?api=https://your-backend.example` to override it. The chosen value is stored in `localStorage` under `zr_api_base`. Clear that key or pass another `?api=` value to switch backends. A tunnel URL changes when the tunnel service restarts, so update the default and the Discord Redirect URI together.
 
-Signed-in users get a profile card with avatar, Discord name, handle, ID, and the real status dot from bot-side snapshots. Clicking the logo opens a left sidebar with navigation and the profile card at the bottom; the Verify button moves there until the user is signed in with an allowed role.
+Signed-in users get a profile card with avatar, Discord name, handle, ID, and the real status dot from bot-side snapshots. Clicking the logo opens a left sidebar with navigation and the profile card at the bottom. Until the account is signed in with an allowed role, the Mod Panel buttons act as Verify buttons and the Verify button moves into the sidebar; once access is granted, only then do the Mod Panel buttons link to the Mod Panel. The Join Discord button is hidden for accounts already in the server.
 
 ## Redirect URI setup
 
