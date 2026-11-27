@@ -353,7 +353,6 @@ button.brand:hover span { color: #fff; }
   grid-template-columns: 280px minmax(0, 1fr) 260px;
   align-items: center;
   height: 64px;
-  overflow: hidden;
   isolation: isolate;
   border-radius: 24px;
   background: rgba(10, 10, 10, 0.9);
@@ -367,6 +366,7 @@ button.brand:hover span { color: #fff; }
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  border-radius: inherit;
   background: var(--mp-accent);
   transform: scaleX(var(--mp-progress-scale));
   transform-origin: left center;
@@ -412,8 +412,12 @@ button.brand:hover span { color: #fff; }
   background: transparent;
   cursor: pointer;
   outline: none;
+  box-shadow: none;
 }
+.mp-seek:focus, .mp-seek:focus-visible { outline: none; box-shadow: none; }
 .mp-seek::-webkit-slider-runnable-track {
+  outline: none;
+  box-shadow: none;
   height: 2px;
   border-radius: 999px;
   background: linear-gradient(to right, var(--mp-accent-solid) var(--progress, 0%), rgba(255, 255, 255, 0.15) var(--progress, 0%));
@@ -438,8 +442,8 @@ button.brand:hover span { color: #fff; }
   border-radius: 0;
   opacity: 0;
 }
-.mp-tools { justify-self: end; display: flex; align-items: center; gap: 2px; padding: 3px; margin-right: 18px; border-radius: 8px; background: #141414; border: 1px solid rgba(255, 255, 255, 0.04); overflow: visible; }
-.mp-tools > button, .mp-volume-toggle { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #b5bac1; background: transparent !important; position: relative; transition: color 0.15s ease, background 0.15s ease; }
+.mp-tools { position: static; justify-self: end; display: flex; align-items: center; gap: 2px; padding: 3px; margin-right: 18px; border-radius: 8px; background: #141414; border: 1px solid rgba(255, 255, 255, 0.04); overflow: visible; }
+.mp-tools > button, .mp-volume-toggle { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #dcdee1; background: transparent !important; position: relative; transition: color 0.15s ease, background 0.15s ease; }
 .mp-tools > button:hover, .mp-volume-toggle:hover { color: #fff; background: rgba(255, 255, 255, 0.09) !important; }
 .mp-tools > button.active { color: #fff; background: rgba(255, 255, 255, 0.14) !important; }
 .mp-one { position: absolute; right: 1px; bottom: 1px; font-size: 8px; line-height: 1; }
@@ -470,7 +474,7 @@ button.brand:hover span { color: #fff; }
 .mp-volume-track { position: relative; width: 6px; height: 72px; border-radius: 999px; background: rgba(0, 0, 0, 0.18); cursor: pointer; outline: none; transition: transform 0.15s ease; }
 .mp-volume-track:hover, .mp-volume-track:focus-visible { transform: scaleX(1.25); }
 .mp-volume-fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 999px; background: #f2f3f5; transition: height 0.1s ease-out; }
-.mp-unmute { position: absolute; right: 0; bottom: calc(100% + 12px); width: auto !important; height: auto !important; padding: 6px 10px; border-radius: 999px; background: #f2f3f5 !important; color: #1e1f22 !important; font-size: 11px; font-weight: 600; white-space: nowrap; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
+.mp-unmute { position: absolute; right: 18px; bottom: calc(100% + 10px); width: auto !important; height: auto !important; padding: 6px 10px; border-radius: 999px; background: #f2f3f5 !important; color: #1e1f22 !important; font-size: 11px; font-weight: 600; white-space: nowrap; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.15s ease; }
 .mp-unmute.visible { visibility: visible; opacity: 1; pointer-events: auto; }
 
 .user-popout {
