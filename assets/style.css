@@ -344,9 +344,9 @@ button.brand:hover span { color: #fff; }
   --ag-radius: 32px;
   --ag-tint: transparent;
   --ag-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-  --mp-accent-start: rgba(30, 31, 34, 0.2);
-  --mp-accent-mid: rgba(44, 47, 52, 0.16);
-  --mp-accent-end: rgba(20, 22, 22, 0.2);
+  --mp-accent-start: rgb(30, 31, 34);
+  --mp-accent-mid: rgb(44, 47, 52);
+  --mp-accent-end: rgb(20, 22, 22);
   --mp-accent-solid: #3a4145;
   --mp-progress-scale: 0;
   position: fixed;
