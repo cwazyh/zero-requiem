@@ -99,11 +99,13 @@ Moderation, message, server, and voice logs are not exposed by the bot data laye
 
 ## Soundtrack
 
-The static site ships ten local MP3 files under `docs/assets/music/`. The player is pinned at the bottom of both pages and supports play/pause, previous, next, shuffle, repeat off/all/one, seeking, keyboard shortcuts, volume, and mute.
+The static site ships ten local MP3 files under `docs/assets/music/`. The pinned bar mirrors the Linear desktop player: a 64px dark translucent container, 38px rounded cover, centred 34px circular play/pause, compact transport buttons, a right-side tool pill, a thin seek line, and a vertical light volume popup with a 72px slider and percentage label. A heart button saves a track locally.
+
+Music starts automatically on page load. Browsers can block audible autoplay, so the player retries muted and shows an `Enable sound` pill; the first pointer interaction also unmutes it. On the very first visit in a browser, `COLORS` always starts. Every later visit picks one of all ten tracks uniformly (10% each) and enables shuffle.
 
 Track metadata lives in `docs/assets/music/tracks.json`. Cover images belong in `docs/assets/music/covers/`; set each track's `cover` field to the image filename. Until covers are supplied, the player falls back to `assets/logo.png`.
 
-Keyboard shortcuts: `Space` toggles playback, `ArrowLeft` and `ArrowRight` seek by five seconds. Shortcuts are ignored while typing in a form field.
+Keyboard shortcuts: `Space` toggles playback, `ArrowLeft` and `ArrowRight` seek by five seconds, and the volume popup supports `ArrowUp`/`ArrowDown`, `Home`, `End`, and the mouse wheel. Shortcuts are ignored while typing in a form field.
 
 ## Security notes
 
