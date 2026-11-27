@@ -4,6 +4,7 @@ const VISIT_KEY = "zr_soundtrack_visited_v1";
 const FIRST_TRACK_FILE = "colors-flow.mp3";
 const DEFAULT_VOLUME = 0.7;
 const FADE_SECONDS = 8;
+const MODE_KEY = "zr_soundtrack_mode";
 
 const ICONS = {
   play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
@@ -53,10 +54,11 @@ let autoplayBlocked = false;
 let seeking = false;
 let resumeAfterSeek = false;
 let volumePinned = false;
-let suppressVolumeHover = false;
 let volumeCloseTimer = null;
 let queuePinned = false;
 let queueCloseTimer = null;
+let queueDragging = false;
+let suppressQueueClick = false;
 let draggedIndex = null;
 const durations = new Map();
 
@@ -82,6 +84,22 @@ function isFirstVisit() {
 
 function markVisited() {
   writeStorage(VISIT_KEY, "1");
+}
+
+function profileModeKey() {
+  const id = window.ZR_PROFILE && window.ZR_PROFILE.id;
+  return id ? `${MODE_KEY}_${id}` : MODE_KEY;
+}
+
+function restoreMode() {
+  const stored = readStorage(profileModeKey());
+  playbackMode = stored === "loop" || stored === "shuffle" ? stored : "shuffle";
+  updateModeIcon();
+}
+
+function rememberMode() {
+  writeStorage(profileModeKey(), playbackMode);
+  if (window.ZR_PROFILE && window.ZR_PROFILE.id) writeStorage(MODE_KEY, playbackMode);
 }
 
 function formatTime(seconds) {
@@ -507,11 +525,17 @@ function buildQueueList() {
 
     row.append(grip, image, copy, duration);
     row.addEventListener("click", () => {
+      if (suppressQueueClick) {
+        suppressQueueClick = false;
+        return;
+      }
       selectTrack(index, true);
       closeQueuePopup(true);
     });
     row.addEventListener("dragstart", (event) => {
       draggedIndex = index;
+      queueDragging = true;
+      clearQueueCloseTimer();
       queueList.classList.add("dragging");
       row.classList.add("dragging");
       event.dataTransfer.effectAllowed = "move";
@@ -520,6 +544,8 @@ function buildQueueList() {
     row.addEventListener("dragend", () => {
       clearDragMarks();
       draggedIndex = null;
+      queueDragging = false;
+      suppressQueueClick = true;
     });
     row.addEventListener("dragover", (event) => {
       event.preventDefault();
@@ -588,8 +614,7 @@ async function loadTracks() {
     tracks = Array.isArray(data.tracks) ? data.tracks : [];
     if (!tracks.length) throw new Error("No tracks available");
     shuffleOrder();
-    playbackMode = "shuffle";
-    updateModeIcon();
+    restoreMode();
     buildTrackList();
     buildQueueList();
     selectTrack(initialTrackIndex(firstVisit), false);
@@ -708,8 +733,11 @@ if (modeButton) {
   modeButton.addEventListener("click", () => {
     playbackMode = playbackMode === "shuffle" ? "loop" : "shuffle";
     updateModeIcon();
+    rememberMode();
   });
 }
+
+window.addEventListener("zr:profile", restoreMode);
 
 if (seekInput) {
   const applySeek = () => {
@@ -751,26 +779,15 @@ if (volumeToggle) {
     const open = Boolean(volumePopup && volumePopup.classList.contains("open"));
     if (open) {
       volumePinned = false;
-      suppressVolumeHover = true;
       closeVolumePopup(true);
     } else {
       volumePinned = true;
-      suppressVolumeHover = false;
       openVolumePopup(true);
     }
-  });
-  volumeToggle.addEventListener("pointerenter", () => {
-    if (!suppressVolumeHover) openVolumePopup();
-  });
-  volumeToggle.addEventListener("pointerleave", () => {
-    suppressVolumeHover = false;
-    scheduleVolumeClose();
   });
 }
 
 if (volumePopup) {
-  volumePopup.addEventListener("pointerenter", () => openVolumePopup(true));
-  volumePopup.addEventListener("pointerleave", scheduleVolumeClose);
   volumePopup.addEventListener("wheel", (event) => {
     cancelFade();
     event.preventDefault();
@@ -825,13 +842,6 @@ if (queueButton) {
       openQueuePopup(true);
     }
   });
-  queueButton.addEventListener("pointerenter", () => openQueuePopup());
-  queueButton.addEventListener("pointerleave", scheduleQueueClose);
-}
-
-if (queuePopup) {
-  queuePopup.addEventListener("pointerenter", () => openQueuePopup(true));
-  queuePopup.addEventListener("pointerleave", scheduleQueueClose);
 }
 
 audio.addEventListener("play", updatePlayIcon);
@@ -855,7 +865,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("pointerdown", (event) => {
-  if (queuePopup && queuePopup.classList.contains("open") && !queuePinned && !queuePopup.contains(event.target) && !queueButton.contains(event.target)) closeQueuePopup(true);
+  if (queuePopup && queuePopup.classList.contains("open") && !queueDragging && !queuePopup.contains(event.target) && !queueButton.contains(event.target)) closeQueuePopup(true);
   if (volumePopup && volumePopup.classList.contains("open") && !volumePinned && !volumePopup.contains(event.target) && !volumeToggle.contains(event.target)) closeVolumePopup(true);
 });
 
