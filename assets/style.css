@@ -556,10 +556,16 @@ button.brand:hover span { color: #fff; }
 .mp-queue-row.active { background: rgba(76, 89, 93, 0.32); box-shadow: inset 2px 0 0 #cccfd2; }
 .mp-queue-row.active .mp-queue-copy strong { color: #f2f3f5; }
 .mp-queue-list.dragging .mp-queue-row:hover { background: transparent; }
-.mp-queue-row.dragging { opacity: 0.32; transform: scale(0.985); }
-.mp-queue-row.drop-before::before, .mp-queue-row.drop-after::after { content: ""; position: absolute; left: 8px; right: 8px; height: 2px; border-radius: 2px; background: #cccfd2; box-shadow: 0 0 0 2px rgba(20, 21, 24, 0.95); pointer-events: none; }
+.mp-queue-row.dragging { opacity: 0.2; transform: none; background: transparent; box-shadow: none; }
+.mp-queue-row.dragging > * { visibility: hidden; }
+.mp-queue-row.drop-before::before, .mp-queue-row.drop-after::after { content: ""; position: absolute; left: 6px; right: 6px; height: 2px; border-radius: 2px; background: #cccfd2; box-shadow: 0 1px 8px rgba(0, 0, 0, 0.85); pointer-events: none; }
 .mp-queue-row.drop-before::before { top: -1px; }
 .mp-queue-row.drop-after::after { bottom: -1px; }
+.mp-queue-drag-ghost { position: fixed; top: -200px; left: -200px; z-index: -1; display: flex; align-items: center; gap: 10px; width: 218px; height: 46px; padding: 6px 10px; border-radius: 12px; border: 1px solid rgba(204, 207, 210, 0.32); background: rgba(24, 25, 28, 0.97); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.62); color: #f2f3f5; pointer-events: none; }
+.mp-queue-drag-ghost img { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 8px; object-fit: cover; background: #232428; }
+.mp-queue-drag-ghost span { display: flex; min-width: 0; flex-direction: column; }
+.mp-queue-drag-ghost strong { overflow: hidden; font-size: 12px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
+.mp-queue-drag-ghost span span { overflow: hidden; font-size: 10px; color: #949ba4; white-space: nowrap; text-overflow: ellipsis; }
 .mp-queue-grip { width: 16px; height: 24px; display: grid; place-items: center; flex: none; color: #72767d; cursor: grab; transition: color 0.15s ease, transform 0.15s ease; }
 .mp-queue-grip:hover, .mp-queue-row:hover .mp-queue-grip { color: #b5bac1; }
 .mp-queue-grip:active { cursor: grabbing; }
