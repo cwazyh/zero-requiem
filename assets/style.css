@@ -15,6 +15,8 @@
 
 * { box-sizing: border-box; }
 
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   font-family: var(--font);
@@ -234,7 +236,7 @@ button.brand:hover span { color: #fff; }
 .sidebar-scrim {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 61;
   background: rgba(10, 12, 12, 0.7);
   opacity: 0;
   transition: opacity 0.28s ease;
@@ -246,7 +248,7 @@ button.brand:hover span { color: #fff; }
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 41;
+  z-index: 62;
   width: min(340px, 86vw);
   padding: 26px 22px;
   display: flex;
