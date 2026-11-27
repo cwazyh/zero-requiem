@@ -1,6 +1,7 @@
 const AUDIO_BASE = "assets/music/";
 const FALLBACK_COVER = "assets/logo.png";
 const REPEAT_MODES = ["off", "all", "one"];
+const PLAYBACK_RATES = [1, 1.25, 1.5, 2];
 const VISIT_KEY = "zr_soundtrack_visited_v1";
 const FIRST_TRACK_FILE = "colors-flow.mp3";
 const DEFAULT_VOLUME = 0.8;
@@ -10,14 +11,15 @@ const ICONS = {
   pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>',
   previous: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 6v12H5V6h2zm2 6l9 6V6l-9 6z"/></svg>',
   next: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 6v12h2V6h-2zm-2 6L6 6v12l9-6z"/></svg>',
-  shuffle:
-    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 3h7v7h-2V6.4l-6.3 6.3-1.4-1.4L17.6 5H14V3zM3 6h4.5l3.5 4-1.4 1.4L6.5 8H3V6zm18 9v6h-7v-2h3.6l-6.3-6.3 1.4-1.4L19 17.6V15h2z"/></svg>',
-  repeat:
-    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>',
-  volume:
-    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>',
-  mute:
-    '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.6 3 2.2-2.2-1.4-1.4-2.2 2.2-2.2-2.2-1.4 1.4 2.2 2.2-2.2 2.2 1.4 1.4 2.2-2.2 2.2 2.2 1.4-1.4-2.2-2.2z"/></svg>',
+  shuffle: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 3h7v7h-2V6.4l-6.3 6.3-1.4-1.4L17.6 5H14V3zM3 6h4.5l3.5 4-1.4 1.4L6.5 8H3V6zm18 9v6h-7v-2h3.6l-6.3-6.3 1.4-1.4L19 17.6V15h2z"/></svg>',
+  repeat: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>',
+  volume: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>',
+  mute: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.6 3 2.2-2.2-1.4-1.4-2.2 2.2-2.2-2.2-1.4 1.4 2.2 2.2-2.2 2.2 1.4 1.4 2.2-2.2 2.2 2.2 1.4-1.4-2.2-2.2z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 20.5S4.5 16 4.5 10.8A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16 12 20.5 12 20.5z"/></svg>',
+  heartFill: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5S4.5 16 4.5 10.8A4.3 4.3 0 0 1 12 8a4.3 4.3 0 0 1 7.5 2.8C19.5 16 12 20.5 12 20.5z"/></svg>',
+  speed: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM10 8v8l6-4-6-4z"/></svg>',
+  open: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 5h5V3H3v7h2V5zm9-2v2h5v5h2V3h-7zm5 14v5h-5v2h7v-7h-2zM3 14v7h7v-2H5v-5H3z"/></svg>',
+  queue: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 6h11v2H4V6zm0 5h11v2H4v-2zm0 5h7v2H4v-2zm13-9v10.5a3.5 3.5 0 1 0 2 3.16V10h3V7h-5z"/></svg>',
 };
 
 const audio = document.getElementById("mp-audio");
@@ -30,6 +32,7 @@ const previousButton = document.getElementById("mp-prev");
 const nextButton = document.getElementById("mp-next");
 const shuffleButton = document.getElementById("mp-shuffle");
 const repeatButton = document.getElementById("mp-repeat");
+const speedButton = document.getElementById("mp-speed");
 const seekInput = document.getElementById("mp-seek");
 const currentNode = document.getElementById("mp-current");
 const durationNode = document.getElementById("mp-duration");
@@ -41,14 +44,17 @@ const volumePercent = document.getElementById("mp-volume-percent");
 const popupMuteButton = document.getElementById("mp-popup-mute");
 const unmuteButton = document.getElementById("mp-unmute");
 const likeButton = document.getElementById("mp-like");
+const openButton = document.getElementById("mp-open");
+const queueButton = document.getElementById("mp-queue");
 const trackList = document.getElementById("track-list");
 
 let tracks = [];
 let currentIndex = 0;
 let shuffle = false;
 let repeatModeIndex = 0;
+let rateIndex = 0;
 let lastVolume = DEFAULT_VOLUME;
-let autoplayBlocked = false;
+let autoplayBlocked = true;
 let volumePinned = false;
 let volumeCloseTimer = null;
 
@@ -105,12 +111,10 @@ function updateShuffleIcon() {
 
 function updateRepeatIcon() {
   const mode = REPEAT_MODES[repeatModeIndex];
-  if (repeatButton) {
-    repeatButton.innerHTML = `${ICONS.repeat}${mode === "one" ? '<span class="mp-one">1</span>' : ""}`;
-    repeatButton.classList.toggle("active", mode !== "off");
-    repeatButton.setAttribute("aria-label", `Repeat ${mode}`);
-    repeatButton.title = `Repeat ${mode}`;
-  }
+  repeatButton.innerHTML = `${ICONS.repeat}${mode === "one" ? '<span class="mp-one">1</span>' : ""}`;
+  repeatButton.classList.toggle("active", mode !== "off");
+  repeatButton.setAttribute("aria-label", `Repeat ${mode}`);
+  repeatButton.title = `Repeat ${mode}`;
 }
 
 function updateVolumeIcons() {
@@ -135,6 +139,7 @@ function setVolume(level) {
   if (clamped > 0) lastVolume = clamped;
   audio.volume = clamped;
   audio.muted = clamped === 0;
+  autoplayBlocked = false;
   updateVolumeVisual();
 }
 
@@ -146,8 +151,7 @@ function toggleMute() {
 function updateLikeButton(track) {
   if (!likeButton || !track) return;
   const liked = readStorage(`zr_soundtrack_like_${track.file}`) === "1";
-  likeButton.textContent = liked ? "♥" : "♡";
-  likeButton.setAttribute("aria-label", liked ? "Remove from favourites" : "Add to favourites");
+  setIcon(likeButton, liked ? "heartFill" : "heart", liked ? "Remove from favourites" : "Add to favourites");
   likeButton.setAttribute("aria-pressed", String(liked));
 }
 
@@ -169,16 +173,40 @@ function updateSeekVisual() {
   durationNode.textContent = formatTime(duration);
 }
 
+function updateSpeedIcon() {
+  const rate = PLAYBACK_RATES[rateIndex];
+  setIcon(speedButton, "speed", `Playback speed ${rate}x`);
+  speedButton.title = `Playback speed: ${rate}x`;
+}
+
+function startAutoplay() {
+  audio.muted = true;
+  autoplayBlocked = true;
+  updateVolumeVisual();
+
+  const attempt = () => {
+    const result = audio.play();
+    if (result && typeof result.catch === "function") {
+      result.catch(() => {});
+    }
+  };
+
+  if (audio.readyState >= 2) attempt();
+  else audio.addEventListener("canplay", attempt, { once: true });
+}
+
 async function playAudio() {
   try {
     await audio.play();
     autoplayBlocked = false;
   } catch (_) {
-    autoplayBlocked = true;
     audio.muted = true;
+    autoplayBlocked = true;
     try {
       await audio.play();
     } catch (_) {
+      updatePlayIcon();
+      updateVolumeVisual();
       return;
     }
   }
@@ -283,7 +311,7 @@ async function loadTracks() {
     updateShuffleIcon();
     buildTrackList();
     selectTrack(initialTrackIndex(), false);
-    playAudio();
+    startAutoplay();
   } catch (_) {
     if (titleNode) titleNode.textContent = "Soundtrack unavailable";
     if (artistNode) artistNode.textContent = "Track list could not be loaded";
@@ -350,9 +378,20 @@ function startVolumeDrag(event) {
   window.addEventListener("pointercancel", stop);
 }
 
+function scrollToSoundtrack() {
+  const target = document.getElementById("soundtrack");
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function scrollToQueue() {
+  const target = document.getElementById("track-list");
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 updatePlayIcon();
 updateShuffleIcon();
 updateRepeatIcon();
+updateSpeedIcon();
 updateVolumeVisual();
 
 if (playButton) playButton.addEventListener("click", togglePlay);
@@ -370,6 +409,14 @@ if (repeatButton) {
   repeatButton.addEventListener("click", () => {
     repeatModeIndex = (repeatModeIndex + 1) % REPEAT_MODES.length;
     updateRepeatIcon();
+  });
+}
+
+if (speedButton) {
+  speedButton.addEventListener("click", () => {
+    rateIndex = (rateIndex + 1) % PLAYBACK_RATES.length;
+    audio.playbackRate = PLAYBACK_RATES[rateIndex];
+    updateSpeedIcon();
   });
 }
 
@@ -437,6 +484,12 @@ if (likeButton) {
   });
 }
 
+if (openButton) openButton.addEventListener("click", scrollToSoundtrack);
+if (queueButton) {
+  if (!trackList) queueButton.hidden = true;
+  else queueButton.addEventListener("click", scrollToQueue);
+}
+
 audio.addEventListener("play", updatePlayIcon);
 audio.addEventListener("pause", updatePlayIcon);
 audio.addEventListener("ended", handleEnded);
@@ -446,7 +499,7 @@ audio.addEventListener("volumechange", updateVolumeVisual);
 
 document.addEventListener("keydown", (event) => {
   const activeTag = document.activeElement ? document.activeElement.tagName : "";
-  if (["INPUT", "TEXTAREA", "SELECT"].includes(activeTag)) return;
+  if (["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(activeTag)) return;
   if (event.code === "Space") {
     event.preventDefault();
     togglePlay();
@@ -462,5 +515,7 @@ document.addEventListener("pointerdown", () => {
 });
 
 if (player) player.classList.add("ready");
-setVolume(DEFAULT_VOLUME);
+audio.volume = DEFAULT_VOLUME;
+audio.muted = true;
+updateVolumeVisual();
 loadTracks();
