@@ -2,7 +2,8 @@ const AUDIO_BASE = "assets/music/";
 const FALLBACK_COVER = "assets/logo.png";
 const VISIT_KEY = "zr_soundtrack_visited_v1";
 const FIRST_TRACK_FILE = "colors-flow.mp3";
-const DEFAULT_VOLUME = 0.8;
+const DEFAULT_VOLUME = 0.7;
+const FADE_SECONDS = 8;
 
 const ICONS = {
   play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
@@ -292,60 +293,56 @@ function updateSeekVisual() {
   durationNode.textContent = formatTime(duration);
 }
 
-function startAutoplay() {
-  audio.muted = true;
-  audio.defaultMuted = true;
-  audio.volume = lastVolume || DEFAULT_VOLUME;
-  autoplayBlocked = false;
-  updateVolumeVisual();
+let fadeFrame = null;
 
-  let attempted = false;
-  const attempt = () => {
-    if (attempted) return;
-    attempted = true;
-    audio.play().then(() => {
-      const unmute = () => {
-        audio.muted = false;
-        audio.defaultMuted = false;
-        audio.volume = lastVolume || DEFAULT_VOLUME;
-        autoplayBlocked = false;
-        updateVolumeVisual();
-        updatePlayIcon();
-      };
-      window.setTimeout(unmute, 0);
-      if (audio.readyState < 2) audio.addEventListener("loadeddata", unmute, { once: true });
-    }).catch(() => {
-      autoplayBlocked = true;
-      audio.play().catch(() => {});
-      updateVolumeVisual();
-      updatePlayIcon();
-    });
-  };
-
-  if (audio.readyState >= 2) attempt();
-  else {
-    audio.addEventListener("canplay", attempt, { once: true });
-    audio.addEventListener("loadeddata", attempt, { once: true });
+function cancelFade() {
+  if (fadeFrame !== null) {
+    window.cancelAnimationFrame(fadeFrame);
+    fadeFrame = null;
   }
-  audio.load();
 }
 
-function primeAudio() {
-  if (!audio.paused && !audio.muted) return;
+function fadeInVolume() {
+  cancelFade();
+  const started = performance.now();
+  const duration = FADE_SECONDS * 1000;
+  const step = (now) => {
+    const t = Math.min(1, (now - started) / duration);
+    const eased = t * t * (3 - 2 * t);
+    setVolume(DEFAULT_VOLUME * eased);
+    if (t < 1) fadeFrame = window.requestAnimationFrame(step);
+    else fadeFrame = null;
+  };
+  fadeFrame = window.requestAnimationFrame(step);
+}
+
+async function beginPlayback() {
+  if (!audio.src) return;
+  cancelFade();
   audio.muted = false;
   audio.defaultMuted = false;
-  audio.volume = lastVolume || DEFAULT_VOLUME;
+  audio.volume = 0;
   autoplayBlocked = false;
   updateVolumeVisual();
-  if (audio.paused && audio.src) playAudio();
+  try {
+    await audio.play();
+  } catch (_) {
+    audio.muted = true;
+    autoplayBlocked = true;
+    try {
+      await audio.play();
+    } catch (_) {
+      updatePlayIcon();
+      updateVolumeVisual();
+      return;
+    }
+  }
+  fadeInVolume();
+  updatePlayIcon();
+  updateVolumeVisual();
 }
 
-["pointerdown", "keydown", "touchstart", "wheel", "scroll"].forEach((eventName) => {
-  document.addEventListener(eventName, primeAudio, { passive: true });
-});
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) primeAudio();
-});
+window.addEventListener("zr:access", beginPlayback, { once: true });
 
 async function playAudio() {
   try {
@@ -368,6 +365,7 @@ async function playAudio() {
 }
 
 function togglePlay() {
+  cancelFade();
   if (!audio.src) return;
   if (audio.paused) playAudio();
   else audio.pause();
@@ -595,7 +593,7 @@ async function loadTracks() {
     buildTrackList();
     buildQueueList();
     selectTrack(initialTrackIndex(firstVisit), false);
-    startAutoplay();
+    updateVolumeVisual();
   } catch (_) {
     if (titleNode) titleNode.textContent = "Soundtrack unavailable";
     if (artistNode) artistNode.textContent = "Track list could not be loaded";
@@ -675,6 +673,7 @@ function levelFromPointer(event) {
 
 function startVolumeDrag(event) {
   if (event.button !== 0) return;
+  cancelFade();
   event.preventDefault();
   event.stopPropagation();
   volumePinned = true;
@@ -773,6 +772,7 @@ if (volumePopup) {
   volumePopup.addEventListener("pointerenter", () => openVolumePopup(true));
   volumePopup.addEventListener("pointerleave", scheduleVolumeClose);
   volumePopup.addEventListener("wheel", (event) => {
+    cancelFade();
     event.preventDefault();
     setVolume(audio.volume + (event.deltaY < 0 ? 0.04 : -0.04));
   }, { passive: false });
@@ -781,6 +781,7 @@ if (volumePopup) {
 if (volumeTrack) {
   volumeTrack.addEventListener("pointerdown", startVolumeDrag);
   volumeTrack.addEventListener("keydown", (event) => {
+    cancelFade();
     if (event.key === "ArrowUp" || event.key === "ArrowRight") {
       event.preventDefault();
       setVolume(audio.volume + 0.05);
@@ -797,7 +798,10 @@ if (volumeTrack) {
   });
 }
 
-if (popupMuteButton) popupMuteButton.addEventListener("click", toggleMute);
+if (popupMuteButton) popupMuteButton.addEventListener("click", () => {
+  cancelFade();
+  toggleMute();
+});
 if (likeButton) {
   likeButton.addEventListener("click", () => {
     const track = tracks[currentIndex];
@@ -851,14 +855,13 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("pointerdown", (event) => {
-  primeAudio();
   if (queuePopup && queuePopup.classList.contains("open") && !queuePinned && !queuePopup.contains(event.target) && !queueButton.contains(event.target)) closeQueuePopup(true);
   if (volumePopup && volumePopup.classList.contains("open") && !volumePinned && !volumePopup.contains(event.target) && !volumeToggle.contains(event.target)) closeVolumePopup(true);
 });
 
 if (player) player.classList.add("ready");
-audio.volume = lastVolume;
-audio.muted = false;
-audio.defaultMuted = false;
+audio.volume = 0;
+audio.muted = true;
+audio.defaultMuted = true;
 updateVolumeVisual();
 loadTracks();
