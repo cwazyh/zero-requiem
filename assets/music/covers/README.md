@@ -1,14 +1,3 @@
-Place cover images for the soundtrack in this folder.
+All ten soundtrack covers are installed here as `.jpeg` files. Each track in `../tracks.json` points to its matching cover through the `cover` field.
 
-Each track in `../tracks.json` has a `cover` field. Set it to the filename of the image stored here, for example:
-
-```json
-{
-  "title": "COLORS",
-  "artist": "FLOW",
-  "file": "colors-flow.mp3",
-  "cover": "colors.png"
-}
-```
-
-The player falls back to `assets/logo.png` whenever `cover` is `null` or the image cannot be loaded.
+If a cover is missing or fails to load, the player falls back to a deterministic gradient generated from the track title and artist.
