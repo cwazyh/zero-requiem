@@ -160,6 +160,7 @@ function applyCoverAccent(image) {
   const source = image.src || image.currentSrc;
   if (source) player.style.setProperty("--queue-cover", `url("${source}")`);
   const fallback = () => {
+    player.classList.remove("light-art");
     player.style.setProperty("--mp-accent-start", "rgb(30, 31, 34)");
     player.style.setProperty("--mp-accent-mid", "rgb(44, 47, 52)");
     player.style.setProperty("--mp-accent-end", "rgb(20, 22, 22)");
@@ -178,10 +179,15 @@ function applyCoverAccent(image) {
     const reds = new Array(bucketCount).fill(0);
     const greens = new Array(bucketCount).fill(0);
     const blues = new Array(bucketCount).fill(0);
+    let luminanceTotal = 0;
+    let luminanceCount = 0;
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
+      const alpha = data[i + 3] / 255;
+      luminanceTotal += (0.2126 * r + 0.7152 * g + 0.0722 * b) * alpha;
+      luminanceCount += alpha;
       const [hue, saturation, lightness] = rgbToHsl(r, g, b);
       if (lightness < 0.1 || lightness > 0.95 || saturation < 0.2) continue;
       const weight = saturation * (1 - Math.abs(lightness - 0.55) * 0.7);
@@ -211,6 +217,8 @@ function applyCoverAccent(image) {
       if (picked.length === 3) break;
     }
     if (!picked.length) return fallback();
+    const averageLuminance = luminanceCount > 0 ? luminanceTotal / luminanceCount / 255 : 0;
+    player.classList.toggle("light-art", averageLuminance > 0.58);
     picked.sort((first, second) => first.hue - second.hue);
     const stops = picked.map(({ hue, saturation, lightness }) => {
       const safeSaturation = Math.max(0.55, saturation);
