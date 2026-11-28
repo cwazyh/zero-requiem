@@ -798,16 +798,26 @@ function clearQueueCloseTimer() {
   }
 }
 
+function artQueueMask(width, height) {
+  if (!width || !height) return "none";
+  const radius = Math.min(16, width / 2, height / 2);
+  const outline = `M${radius} 0 H${width - radius} A${radius} ${radius} 0 0 1 ${width} ${radius} V${height} H0 V${radius} A${radius} ${radius} 0 0 1 ${radius} 0 Z`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><path d="${outline}" fill="#fff"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
 function syncArtSpan() {
   if (!player) return;
   const playerRect = player.getBoundingClientRect();
   const barHeight = playerRect.height || 64;
+  const maxQueueHeight = Math.min(468, Math.max(0, window.innerHeight - 108));
+  const span = barHeight + maxQueueHeight;
   const open = Boolean(queuePopup && queuePopup.classList.contains("open"));
   const queueRect = open && queuePopup ? queuePopup.getBoundingClientRect() : null;
   const queueHeight = queueRect ? queueRect.height : 0;
   const queueWidth = queueRect ? queueRect.width : 0;
   const queueX = queueRect ? queueRect.right - playerRect.left - queueWidth : 0;
-  const span = barHeight + queueHeight;
+  const queueY = span - barHeight - queueHeight;
 
   player.style.setProperty("--art-bar-height", `${barHeight}px`);
   player.style.setProperty("--art-bar-y", `${span - barHeight}px`);
@@ -815,7 +825,8 @@ function syncArtSpan() {
   player.style.setProperty("--art-queue-w", `${queueWidth}px`);
   player.style.setProperty("--art-queue-h", `${queueHeight}px`);
   player.style.setProperty("--art-queue-x", `${queueX}px`);
-  player.classList.toggle("art-expanded", open && queueHeight > 0);
+  player.style.setProperty("--art-queue-y", `${queueY}px`);
+  player.style.setProperty("--art-queue-mask", artQueueMask(queueWidth, queueHeight));
 }
 
 if (typeof ResizeObserver !== "undefined" && queuePopup) {
@@ -1056,6 +1067,4 @@ updateVolumeVisual();
 syncArtSpan();
 loadTracks();
 
-window.addEventListener("resize", () => {
-  if (queuePopup && queuePopup.classList.contains("open")) syncArtSpan();
-});
+window.addEventListener("resize", syncArtSpan);
