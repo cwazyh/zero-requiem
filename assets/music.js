@@ -6,6 +6,74 @@ const DEFAULT_VOLUME = 0.7;
 const FADE_SECONDS = 8;
 const MODE_KEY = "zr_soundtrack_mode";
 
+let materialModulePromise = null;
+function loadMaterialUtilities() {
+  if (!materialModulePromise) {
+    materialModulePromise = import("./vendor/material-color-utilities/material-color-utilities.mjs").catch(() => null);
+  }
+  return materialModulePromise;
+}
+
+function hexChannels(hex) {
+  const value = hex.replace("#", "");
+  return [0, 2, 4].map((offset) => parseInt(value.slice(offset, offset + 2), 16));
+}
+
+function regionInk(rgb, darkInk, darkSoft, lightInk, lightSoft) {
+  const [r, g, b] = rgb;
+  const luminance = 0.2126 * channelLuminance(r) + 0.7152 * channelLuminance(g) + 0.0722 * channelLuminance(b);
+  return luminance > 0.34 ? [darkInk, darkSoft] : [lightInk, lightSoft];
+}
+
+async function applyMaterialTheme(data, lightArt, regions) {
+  const mcu = await loadMaterialUtilities();
+  if (!mcu || !player) return;
+  const { argbFromRgb, hexFromArgb, Hct, TonalPalette, QuantizerCelebi, Score, SchemeContent } = mcu;
+  const pixels = [];
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 128) continue;
+    pixels.push(argbFromRgb(data[i], data[i + 1], data[i + 2]));
+  }
+  if (!pixels.length) return;
+  let seed;
+  try {
+    const quantized = QuantizerCelebi.quantize(pixels, 128);
+    seed = Score.score(quantized, 4, false)[0];
+  } catch (_) {
+    return;
+  }
+  if (seed == null) return;
+  const hue = Hct.fromInt(seed).hue;
+  const chroma = Hct.fromInt(seed).chroma;
+  const scheme = new SchemeContent(seed, !lightArt);
+  const surface = hexChannels(hexFromArgb(scheme.surface));
+  const panel = hexChannels(hexFromArgb(scheme.surfaceContainerHighest));
+  const rgba = (channels, alpha) => `rgba(${channels[0]}, ${channels[1]}, ${channels[2]}, ${alpha})`;
+  player.style.setProperty("--ag-tint", rgba(surface, lightArt ? 0.22 : 0.18));
+  player.style.setProperty("--ui-veil", rgba(surface, lightArt ? 0.05 : 0.08));
+  player.style.setProperty("--ui-panel-scrim", rgba(panel, lightArt ? 0.16 : 0.19));
+  const palette = TonalPalette.fromHueAndChroma(hue, Math.max(32, Math.min(100, chroma)));
+  const stops = [45, 60, 75].map((tone) => hexFromArgb(palette.tone(tone)));
+  player.style.setProperty("--mp-accent-start", stops[0]);
+  player.style.setProperty("--mp-accent-mid", stops[1]);
+  player.style.setProperty("--mp-accent-end", stops[2]);
+  player.style.setProperty("--mp-accent-solid", stops[0]);
+  const inkChroma = Math.min(14, Math.max(6, chroma / 3));
+  const softChroma = Math.min(12, Math.max(4, chroma / 4));
+  const darkInk = hexFromArgb(Hct.from(hue, inkChroma, 16).toInt());
+  const darkSoft = hexFromArgb(Hct.from(hue, softChroma, 38).toInt());
+  const lightInk = hexFromArgb(Hct.from(hue, inkChroma, 96).toInt());
+  const lightSoft = hexFromArgb(Hct.from(hue, softChroma, 80).toInt());
+  const barInk = regionInk(regions.bar, darkInk, darkSoft, lightInk, lightSoft);
+  const queueInk = regionInk(regions.queue, darkInk, darkSoft, lightInk, lightSoft);
+  const headInk = regionInk(regions.head, darkInk, darkSoft, lightInk, lightSoft);
+  player.style.setProperty("--bar-ink", barInk[0]);
+  player.style.setProperty("--bar-ink-soft", barInk[1]);
+  player.style.setProperty("--queue-ink", queueInk[0]);
+  player.style.setProperty("--queue-ink-soft", queueInk[1]);
+  player.style.setProperty("--queue-head-ink", headInk[0]);
+}
+
 const ICONS = {
   play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
   pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>',
@@ -204,7 +272,6 @@ function applyCoverAccent(image) {
     player.classList.remove("light-art");
     player.style.setProperty("--ui-veil", "rgba(6, 7, 9, 0.22)");
     player.style.setProperty("--ui-panel-scrim", "rgba(6, 7, 9, 0.32)");
-    player.style.setProperty("--ui-text-shadow", "0 1px 3px rgba(0, 0, 0, 0.75)");
     player.style.setProperty("--bar-ink", "rgb(242, 243, 245)");
     player.style.setProperty("--bar-ink-soft", "rgba(148, 155, 164, 0.95)");
     player.style.setProperty("--queue-ink", "rgb(242, 243, 245)");
@@ -223,9 +290,12 @@ function applyCoverAccent(image) {
     if (!context) return fallback();
     context.drawImage(image, 0, 0, 64, 64);
     const data = context.getImageData(0, 0, 64, 64).data;
-    const barInk = inkForBackdrop(...sampleBackdrop(data, 0.08, 0.86, 0.34, 0.98));
-    const queueInk = inkForBackdrop(...sampleBackdrop(data, 0.62, 0.3, 0.98, 0.94));
-    const queueHeadInk = inkForBackdrop(...sampleBackdrop(data, 0.62, 0.04, 0.98, 0.18));
+    const barRegion = sampleBackdrop(data, 0.08, 0.86, 0.34, 0.98);
+    const queueRegion = sampleBackdrop(data, 0.62, 0.3, 0.98, 0.94);
+    const queueHeadRegion = sampleBackdrop(data, 0.62, 0.04, 0.98, 0.18);
+    const barInk = inkForBackdrop(...barRegion);
+    const queueInk = inkForBackdrop(...queueRegion);
+    const queueHeadInk = inkForBackdrop(...queueHeadRegion);
     player.style.setProperty("--bar-ink", barInk.color);
     player.style.setProperty("--bar-ink-soft", barInk.soft);
     player.style.setProperty("--queue-ink", queueInk.color);
@@ -282,7 +352,6 @@ function applyCoverAccent(image) {
     player.classList.toggle("light-art", lightArt);
     player.style.setProperty("--ui-veil", lightArt ? "rgba(248, 249, 250, 0.16)" : "rgba(6, 7, 9, 0.22)");
     player.style.setProperty("--ui-panel-scrim", lightArt ? "rgba(248, 249, 250, 0.28)" : "rgba(6, 7, 9, 0.32)");
-    player.style.setProperty("--ui-text-shadow", lightArt ? "0 1px 2px rgba(255, 255, 255, 0.9)" : "0 1px 3px rgba(0, 0, 0, 0.75)");
     picked.sort((first, second) => first.hue - second.hue);
     const stops = picked.map(({ hue, saturation, lightness }) => {
       const safeSaturation = Math.max(0.55, saturation);
@@ -295,6 +364,7 @@ function applyCoverAccent(image) {
     player.style.setProperty("--mp-accent-mid", stops[1]);
     player.style.setProperty("--mp-accent-end", stops[2]);
     player.style.setProperty("--mp-accent-solid", stops[0]);
+    applyMaterialTheme(data, lightArt, { bar: barRegion, queue: queueRegion, head: queueHeadRegion });
   } catch (_) {
     fallback();
   }
