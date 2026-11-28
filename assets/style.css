@@ -449,8 +449,8 @@ button.brand:hover span { color: #fff; }
   content: "";
   position: absolute;
   top: 0;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   background:
     radial-gradient(circle at 18% 12%, rgba(44, 57, 61, 0.85), transparent 42%),
     radial-gradient(circle at 82% 88%, rgba(76, 89, 93, 0.35), transparent 38%),
@@ -459,13 +459,13 @@ button.brand:hover span { color: #fff; }
 }
 .mp-art-cover::before {
   left: 0;
-  -webkit-mask-image: radial-gradient(circle at 100% 100%, transparent 32px, #000 33px);
-  mask-image: radial-gradient(circle at 100% 100%, transparent 32px, #000 33px);
+  -webkit-mask-image: radial-gradient(circle at 100% 100%, transparent 30px, #000 31px);
+  mask-image: radial-gradient(circle at 100% 100%, transparent 30px, #000 31px);
 }
 .mp-art-cover::after {
   right: 0;
-  -webkit-mask-image: radial-gradient(circle at 0% 100%, transparent 32px, #000 33px);
-  mask-image: radial-gradient(circle at 0% 100%, transparent 32px, #000 33px);
+  -webkit-mask-image: radial-gradient(circle at 0% 100%, transparent 30px, #000 31px);
+  mask-image: radial-gradient(circle at 0% 100%, transparent 30px, #000 31px);
 }
 .music-player > .mp-track, .music-player > .mp-tools, .music-player > .mp-queue-popup { z-index: 3; }
 .music-player button {
