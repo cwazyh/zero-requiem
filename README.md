@@ -113,3 +113,5 @@ Keyboard shortcuts: `Space` toggles playback, `ArrowLeft` and `ArrowRight` seek 
 - OAuth state is stored in the session and checked on callback.
 - Access requires guild membership plus at least one configured staff role.
 - All UI text, API responses, logs, and documentation are in English.
+
+The queue drawer keeps the cover artwork clean, with no scrim over it; only row hover and the selected row add their own tint.
