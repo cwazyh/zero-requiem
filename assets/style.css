@@ -553,7 +553,7 @@ button.brand:hover span { color: #fff; }
 .mp-volume-track:hover, .mp-volume-track:focus-visible { transform: scaleX(1.25); }
 .mp-volume-fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 999px; background: #dcdee1; transition: height 0.1s ease-out; }
 .mp-queue-popup {
-  --ag-radius: 16px;
+  --ag-radius: 32px;
   --ag-tint: rgba(12, 14, 16, 0.18);
   --ag-shadow: none;
   position: absolute;
@@ -563,7 +563,7 @@ button.brand:hover span { color: #fff; }
   width: var(--queue-width);
   max-height: min(468px, calc(100dvh - 108px));
   overflow: hidden;
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--ag-radius);
   border: 0;
   background: transparent;
   backdrop-filter: none;
