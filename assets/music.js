@@ -60,10 +60,10 @@ async function applyMaterialTheme(data, lightArt, regions) {
   player.style.setProperty("--mp-accent-solid", stops[0]);
   const inkChroma = Math.min(14, Math.max(6, chroma / 3));
   const softChroma = Math.min(12, Math.max(4, chroma / 4));
-  const darkInk = hexFromArgb(Hct.from(hue, inkChroma, 16).toInt());
-  const darkSoft = hexFromArgb(Hct.from(hue, softChroma, 38).toInt());
-  const lightInk = hexFromArgb(Hct.from(hue, inkChroma, 96).toInt());
-  const lightSoft = hexFromArgb(Hct.from(hue, softChroma, 80).toInt());
+  const darkInk = hexFromArgb(Hct.from(hue, inkChroma, 12).toInt());
+  const darkSoft = hexFromArgb(Hct.from(hue, softChroma, 34).toInt());
+  const lightInk = hexFromArgb(Hct.from(hue, Math.min(6, inkChroma), 98).toInt());
+  const lightSoft = hexFromArgb(Hct.from(hue, Math.min(5, softChroma), 88).toInt());
   const barInk = regionInk(regions.bar, darkInk, darkSoft, lightInk, lightSoft);
   const queueInk = regionInk(regions.queue, darkInk, darkSoft, lightInk, lightSoft);
   const headInk = regionInk(regions.head, darkInk, darkSoft, lightInk, lightSoft);
@@ -72,6 +72,14 @@ async function applyMaterialTheme(data, lightArt, regions) {
   player.style.setProperty("--queue-ink", queueInk[0]);
   player.style.setProperty("--queue-ink-soft", queueInk[1]);
   player.style.setProperty("--queue-head-ink", headInk[0]);
+  player.style.setProperty("--ui-control-ink", barInk[0]);
+  player.style.setProperty("--ui-control-hover", barInk[0]);
+  player.style.setProperty("--ui-primary-bg", barInk[0]);
+  player.style.setProperty("--ui-primary-ink", barInk[0] === lightInk ? darkInk : lightInk);
+  const tintedGlass = hexFromArgb(Hct.from(hue, Math.min(40, Math.max(18, chroma)), lightArt ? 88 : 22).toInt());
+  player.style.setProperty("--ag-tint", rgba(hexChannels(tintedGlass), lightArt ? 0.3 : 0.26));
+  player.style.setProperty("--ui-veil", rgba(hexChannels(tintedGlass), 0.06));
+  player.style.setProperty("--ui-panel-scrim", rgba(hexChannels(tintedGlass), 0.16));
 }
 
 const ICONS = {
