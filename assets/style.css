@@ -432,7 +432,7 @@ button.brand:hover span { color: #fff; }
 .mp-art-stage::before {
   content: "";
   position: absolute;
-  inset: -64px 0 -8px;
+  inset: -104px 0 -8px;
   background-color: transparent;
   background-image: var(--queue-cover);
   background-size: 100% 100%;
@@ -449,8 +449,8 @@ button.brand:hover span { color: #fff; }
   content: "";
   position: absolute;
   top: 0;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   background:
     radial-gradient(circle at 18% 12%, rgba(44, 57, 61, 0.85), transparent 42%),
     radial-gradient(circle at 82% 88%, rgba(76, 89, 93, 0.35), transparent 38%),
