@@ -25,6 +25,7 @@ body {
     radial-gradient(circle at 18% 12%, rgba(44, 57, 61, 0.85), transparent 42%),
     radial-gradient(circle at 82% 88%, rgba(76, 89, 93, 0.35), transparent 38%),
     var(--bg);
+  background-attachment: fixed;
   min-height: 100vh;
   padding-bottom: 92px;
 }
@@ -441,13 +442,18 @@ button.brand:hover span { color: #fff; }
 .music-player > * { position: relative; z-index: 1; }
 #music-player > .mp-art-stage { position: absolute; z-index: 0; }
 .music-player > .mp-art-cover { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+#music-player.queue-open .mp-art-cover { display: none; }
 .mp-art-cover::before, .mp-art-cover::after {
   content: "";
   position: absolute;
   top: 0;
   width: 32px;
   height: 32px;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(44, 57, 61, 0.85), transparent 42%),
+    radial-gradient(circle at 82% 88%, rgba(76, 89, 93, 0.35), transparent 38%),
+    var(--bg);
+  background-attachment: fixed;
 }
 .mp-art-cover::before {
   left: 0;
