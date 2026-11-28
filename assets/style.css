@@ -431,7 +431,7 @@ button.brand:hover span { color: #fff; }
 .mp-art-stage::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -64px 0 -8px;
   background-color: transparent;
   background-image: var(--queue-cover);
   background-size: 100% 100%;
