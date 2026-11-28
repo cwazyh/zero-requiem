@@ -819,13 +819,12 @@ function syncArtSpan() {
   const headroom = 48;
   const open = Boolean(queuePopup && queuePopup.classList.contains("open"));
   player.classList.toggle("queue-open", open);
-  const queueRect = open && queuePopup ? queuePopup.getBoundingClientRect() : null;
-  const queueWidth = queueRect ? queueRect.width : 0;
-  const queueHeight = queueRect ? queueRect.height : 0;
-  const span = barHeight + Math.max(maxQueueHeight, queueHeight) + headroom;
-  const stageTop = playerRect.bottom - span;
-  const queueX = queueRect ? queueRect.left - playerRect.left : 0;
-  const queueY = queueRect ? queueRect.top - stageTop : 0;
+  const queueWidth = open && queuePopup ? queuePopup.offsetWidth : 0;
+  const queueHeight = open && queuePopup ? queuePopup.offsetHeight : 0;
+  const queueRight = parseFloat(getComputedStyle(player).getPropertyValue("--queue-right")) || 18;
+  const span = barHeight + maxQueueHeight + headroom;
+  const queueX = queueWidth ? playerRect.width - queueRight - queueWidth : 0;
+  const queueY = queueHeight ? span - barHeight - queueHeight : 0;
 
   player.style.setProperty("--art-bar-height", `${barHeight}px`);
   player.style.setProperty("--art-bar-y", `${span - barHeight}px`);
