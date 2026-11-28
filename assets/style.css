@@ -370,7 +370,7 @@ button.brand:hover span { color: #fff; }
 
 .music-player {
   --ag-radius: 32px;
-  --ag-tint: rgba(12, 14, 16, 0.24);
+  --ag-tint: rgba(12, 14, 16, 0.18);
   --ag-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
   --mp-accent-start: rgb(30, 31, 34);
   --mp-accent-mid: rgb(44, 47, 52);
@@ -401,7 +401,7 @@ button.brand:hover span { color: #fff; }
   border-radius: 32px;
 }
 #music-player.ag-glass {
-  --ag-tint: rgba(12, 14, 16, 0.24);
+  --ag-tint: rgba(12, 14, 16, 0.18);
   --ag-radius: 32px;
 }
 .mp-art-stage {
@@ -433,8 +433,9 @@ button.brand:hover span { color: #fff; }
   inset: -24px;
   background-color: transparent;
   background-image: var(--queue-cover);
-  background-size: 230% 100%;
-  background-position: calc(var(--mp-progress-scale) * 100%) center;
+  background-size: 230% var(--art-bar-height);
+  background-repeat: repeat-y;
+  background-position: calc(var(--mp-progress-scale) * 100%) bottom;
   filter: blur(44px) saturate(190%);
   transform: scale(1.15);
   opacity: 0.62;
@@ -556,7 +557,7 @@ button.brand:hover span { color: #fff; }
 .mp-volume-fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 999px; background: #dcdee1; transition: height 0.1s ease-out; }
 .mp-queue-popup {
   --ag-radius: 16px;
-  --ag-tint: rgba(12, 14, 16, 0.16);
+  --ag-tint: rgba(12, 14, 16, 0.18);
   --ag-shadow: none;
   position: absolute;
   right: var(--queue-right);
@@ -583,13 +584,13 @@ button.brand:hover span { color: #fff; }
   pointer-events: none;
 }
 #mp-queue-popup.ag-glass {
-  --ag-tint: rgba(12, 14, 16, 0.16);
+  --ag-tint: rgba(12, 14, 16, 0.18);
   --ag-radius: 16px;
   --ag-shadow: none;
   border-radius: 16px 16px 0 0;
   box-shadow: none;
 }
-#mp-queue-popup.ag-glass > .ag-refract { box-shadow: none; }
+#mp-queue-popup.ag-glass > .ag-refract { background-image: none !important; box-shadow: none; }
 .mp-queue-popup.open { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
 .mp-queue-head, .mp-queue-list { position: relative; z-index: 1; }
 .mp-queue-list { background: transparent; }
