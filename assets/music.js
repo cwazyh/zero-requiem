@@ -800,9 +800,9 @@ function clearQueueCloseTimer() {
 
 function artQueueMask(width, height) {
   if (!width || !height) return "none";
+  const feather = 10;
   const radius = Math.min(16, width / 2, height / 2);
-  const outline = `M${radius} 0 H${width - radius} A${radius} ${radius} 0 0 1 ${width} ${radius} V${height} H0 V${radius} A${radius} ${radius} 0 0 1 ${radius} 0 Z`;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><path d="${outline}" fill="#fff"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><defs><filter id="f" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter></defs><rect x="${feather}" y="${feather}" width="${width - feather * 2}" height="${height - feather * 2}" rx="${radius}" fill="#fff" filter="url(#f)"/></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
