@@ -485,21 +485,21 @@ button.brand:hover span { color: #fff; }
 .mp-meta { display: flex; flex-direction: column; min-width: 0; }
 .mp-meta strong { font-size: 16px; font-weight: 400; line-height: 18px; letter-spacing: 0; color: #f2f3f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mp-meta span { margin-top: 4px; font-size: 12px; font-weight: 300; line-height: 15px; color: #949ba4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-like { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #b5bac1; transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
-.mp-like:hover { color: #f2f3f5; background: rgba(255, 255, 255, 0.09); transform: translateY(-1px) scale(1.06); }
+.mp-like { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ui-control-ink, #b5bac1); transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-like:hover { color: var(--ui-control-hover, #f2f3f5); background: rgba(255, 255, 255, 0.09); transform: translateY(-1px) scale(1.06); }
 .mp-like:active { transform: scale(0.88); }
 .mp-like svg { transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
 .mp-like:hover svg { transform: scale(1.12); }
 .mp-like[aria-pressed="true"] { color: #f23f43; }
 .mp-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
 .mp-controls { position: relative; z-index: 3; display: flex; align-items: center; gap: 8px; pointer-events: auto; }
-.mp-controls button { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #b5bac1; transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
-.mp-controls button:hover { color: #fff; background: rgba(255, 255, 255, 0.09); transform: translateY(-1px) scale(1.06); }
+.mp-controls button { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ui-control-ink, #b5bac1); transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-controls button:hover { color: var(--ui-control-hover, #fff); background: rgba(255, 255, 255, 0.09); transform: translateY(-1px) scale(1.06); }
 .mp-controls button:active { transform: scale(0.92); }
 .mp-controls button svg { transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
 .mp-controls button:hover svg { transform: scale(1.08); }
-.mp-controls button.primary { width: 34px; height: 34px; border-radius: 50%; background: #f2f3f5; color: #1e1f22; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
-.mp-controls button.primary:hover { background: #fff; transform: scale(1.08); }
+.mp-controls button.primary { width: 34px; height: 34px; border-radius: 50%; background: var(--ui-primary-bg, #f2f3f5); color: var(--ui-primary-ink, #1e1f22); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35); }
+.mp-controls button.primary:hover { background: var(--ui-primary-bg, #fff); transform: scale(1.08); }
 .mp-controls button.primary:active { transform: scale(0.94); }
 .mp-controls button.primary svg { width: 16px; height: 16px; }
 .mp-timeline { position: absolute; inset: 0; z-index: 2; pointer-events: auto; }
@@ -536,17 +536,17 @@ button.brand:hover span { color: #fff; }
   padding: 0;
   overflow: visible;
 }
-.mp-tools > button, .mp-volume-toggle { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: #dcdee1; background: transparent !important; position: relative; transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
-.mp-tools > button:hover, .mp-volume-toggle:hover { color: #fff; background: rgba(255, 255, 255, 0.09) !important; transform: translateY(-1px) scale(1.06); }
+.mp-tools > button, .mp-volume-toggle { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; color: var(--ui-control-ink, #dcdee1); background: transparent !important; position: relative; transition: color 0.18s ease, background 0.18s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
+.mp-tools > button:hover, .mp-volume-toggle:hover { color: var(--ui-control-hover, #fff); background: rgba(255, 255, 255, 0.09) !important; transform: translateY(-1px) scale(1.06); }
 .mp-tools > button:active, .mp-volume-toggle:active { transform: scale(0.92); }
 .mp-tools > button svg, .mp-volume-toggle svg { transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1); }
 .mp-tools > button:hover svg, .mp-volume-toggle:hover svg { transform: scale(1.1); }
-.mp-tools > button.active { color: #fff; background: rgba(255, 255, 255, 0.14) !important; }
-#mp-queue[aria-expanded="true"] { color: #fff; background: rgba(255, 255, 255, 0.14) !important; }
+.mp-tools > button.active { color: var(--ui-control-hover, #fff); background: rgba(255, 255, 255, 0.14) !important; }
+#mp-queue[aria-expanded="true"] { color: var(--ui-control-hover, #fff); background: rgba(255, 255, 255, 0.14) !important; }
 .mp-tool-separator { width: 1px; height: 18px; flex: none; margin: 0 3px; border-radius: 1px; background: rgba(255, 255, 255, 0.16); }
 .mp-one { position: absolute; right: 1px; bottom: 1px; font-size: 8px; line-height: 1; }
 .mp-volume-wrap { position: relative; display: flex; align-items: center; }
-.mp-volume-toggle[aria-expanded="true"] { color: #fff; background: rgba(255, 255, 255, 0.14) !important; }
+.mp-volume-toggle[aria-expanded="true"] { color: var(--ui-control-hover, #fff); background: rgba(255, 255, 255, 0.14) !important; }
 .mp-volume-popup {
   position: absolute;
   left: 50%;
@@ -651,26 +651,26 @@ button.brand:hover span { color: #fff; }
 .mp-queue-popup.open .mp-queue-row { animation: mpQueueRowIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--queue-index, 0) * 24ms); }
 #music-player.light-art { --ag-tint: rgba(246, 247, 248, 0.26); }
 #music-player.light-art.ag-glass { --ag-tint: rgba(246, 247, 248, 0.26); }
-#music-player.light-art button { color: #2b2d31; }
+#music-player.light-art button { color: var(--ui-control-ink, #2b2d31); }
 #music-player.light-art .mp-tools > button:focus-visible,
 #music-player.light-art .mp-volume-toggle:focus-visible,
 #music-player.light-art .mp-like:focus-visible { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.22); }
 #music-player.light-art .mp-meta strong { color: #16171a; }
 #music-player.light-art .mp-meta span { color: #3d4148; }
-#music-player.light-art .mp-like { color: #2b2d31; }
-#music-player.light-art .mp-like:hover { color: #101114; background: rgba(0, 0, 0, 0.09); }
+#music-player.light-art .mp-like { color: var(--ui-control-ink, #2b2d31); }
+#music-player.light-art .mp-like:hover { color: var(--ui-control-hover, #101114); background: rgba(0, 0, 0, 0.09); }
 #music-player.light-art .mp-like[aria-pressed="true"] { color: #c33037; }
-#music-player.light-art .mp-controls button { color: #2b2d31; }
-#music-player.light-art .mp-controls button:hover { color: #101114; background: rgba(0, 0, 0, 0.09); }
-#music-player.light-art .mp-controls button.primary { background: #1e1f22; color: #f2f3f5; }
+#music-player.light-art .mp-controls button { color: var(--ui-control-ink, #2b2d31); }
+#music-player.light-art .mp-controls button:hover { color: var(--ui-control-hover, #101114); background: rgba(0, 0, 0, 0.09); }
+#music-player.light-art .mp-controls button.primary { background: var(--ui-primary-bg, #1e1f22); color: var(--ui-primary-ink, #f2f3f5); }
 #music-player.light-art .mp-controls button.primary:hover { background: #000; }
 #music-player.light-art .mp-tools > button,
-#music-player.light-art .mp-volume-toggle { color: #34363b; }
+#music-player.light-art .mp-volume-toggle { color: var(--ui-control-ink, #34363b); }
 #music-player.light-art .mp-tools > button:hover,
-#music-player.light-art .mp-volume-toggle:hover { color: #101114; background: rgba(0, 0, 0, 0.09) !important; }
+#music-player.light-art .mp-volume-toggle:hover { color: var(--ui-control-hover, #101114); background: rgba(0, 0, 0, 0.09) !important; }
 #music-player.light-art .mp-tools > button.active,
 #music-player.light-art .mp-volume-toggle[aria-expanded="true"],
-#music-player.light-art #mp-queue[aria-expanded="true"] { color: #101114; background: rgba(0, 0, 0, 0.13) !important; }
+#music-player.light-art #mp-queue[aria-expanded="true"] { color: var(--ui-control-hover, #101114); background: rgba(0, 0, 0, 0.13) !important; }
 #music-player.light-art .mp-tool-separator { background: rgba(0, 0, 0, 0.2); }
 #music-player.light-art .mp-volume-popup { background: #f2f3f5; border-color: rgba(0, 0, 0, 0.1); color: #1e1f22; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28); }
 #music-player.light-art #mp-volume-percent { color: #2b2d31; }
