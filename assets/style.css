@@ -696,20 +696,32 @@ button.brand:hover span { color: #fff; }
 #music-player.light-art .mp-queue-copy span { color: #4b4f56; }
 #music-player.light-art .mp-queue-duration { color: #4b4f56; }
 #music-player .mp-meta strong,
-#music-player.light-art .mp-meta strong { color: var(--local-ink, var(--bar-ink, #f2f3f5)); }
+#music-player.light-art .mp-meta strong { color: #fff; mix-blend-mode: difference; }
 #music-player .mp-meta span,
-#music-player.light-art .mp-meta span { color: var(--local-ink-soft, var(--bar-ink-soft, #949ba4)); }
+#music-player.light-art .mp-meta span { color: #fff; mix-blend-mode: difference; opacity: 0.72; }
 #music-player .mp-queue-popup,
-#music-player.light-art .mp-queue-popup { color: var(--queue-ink, #dbdee1); }
+#music-player.light-art .mp-queue-popup { color: #fff; mix-blend-mode: difference; }
 #music-player .mp-queue-copy strong,
 #music-player.light-art .mp-queue-copy strong,
-#music-player.light-art .mp-queue-row.active .mp-queue-copy strong { color: var(--local-ink, var(--queue-ink, #f2f3f5)); }
+#music-player.light-art .mp-queue-row.active .mp-queue-copy strong { color: #fff; mix-blend-mode: difference; }
 #music-player .mp-queue-copy span,
 #music-player.light-art .mp-queue-copy span,
 #music-player .mp-queue-duration,
-#music-player.light-art .mp-queue-duration { color: var(--local-ink-soft, var(--queue-ink-soft, #949ba4)); }
+#music-player.light-art .mp-queue-duration { color: #fff; mix-blend-mode: difference; opacity: 0.72; }
 #music-player .mp-queue-head span,
-#music-player.light-art .mp-queue-head span { color: var(--local-ink, var(--queue-head-ink, #949ba4)); }
+#music-player.light-art .mp-queue-head span { color: #fff; mix-blend-mode: difference; opacity: 0.8; }
+#music-player .mp-controls button,
+#music-player.light-art .mp-controls button,
+#music-player .mp-tools > button,
+#music-player.light-art .mp-tools > button,
+#music-player .mp-volume-toggle,
+#music-player.light-art .mp-volume-toggle,
+#music-player .mp-like,
+#music-player.light-art .mp-like,
+#music-player .mp-queue-grip,
+#music-player.light-art .mp-queue-grip,
+#music-player .mp-queue-now i,
+#music-player.light-art .mp-queue-now i { color: #fff; mix-blend-mode: difference; }
 .user-popout {
   position: fixed;
   z-index: 80;
