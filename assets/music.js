@@ -800,8 +800,8 @@ function clearQueueCloseTimer() {
 
 function artQueueMask(width, height) {
   if (!width || !height) return "none";
-  const r = Math.min(16, width / 2, height / 2);
-  const path = `M0 ${height} L0 ${r} Q0 0 ${r} 0 L${width - r} 0 Q${width} 0 ${width} ${r} L${width} ${height} Z`;
+  const r = Math.min(32, width / 2, height / 2);
+  const path = `M0 ${height - r} L0 ${r} Q0 0 ${r} 0 L${width - r} 0 Q${width} 0 ${width} ${r} L${width} ${height - r} Q${width} ${height} ${width - r} ${height} L${r} ${height} Q0 ${height} 0 ${height - r} Z`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><path d="${path}" fill="#fff"/></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
