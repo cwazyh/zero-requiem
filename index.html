@@ -11,8 +11,8 @@
   <meta property="og:url" content="https://cwazyh.github.io/zero-requiem/">
   <meta name="description" content="Zero://Requiem — a private Discord community with Arthur, its moderation and support bot.">
   <link rel="icon" href="assets/logo.png">
-  <link rel="stylesheet" href="assets/style-v58.css?v=58">
-  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=58">
+  <link rel="stylesheet" href="assets/style-v59.css?v=59">
+  <link rel="stylesheet" href="assets/vendor/amazing-glass/amazing-glass.css?v=59">
 </head>
 <body>
   <div class="intro" id="intro" role="dialog" aria-label="Secure uplink">
@@ -210,7 +210,7 @@
     <span>Zero://Requiem • Web Portal</span>
   </footer>
 
-  <ag-glass class="music-player" id="music-player" variant="lens" tone="dark" params='{"blur":0.8,"zoom":1.35,"bezel":0.2,"maxBezel":34,"depth":1.98,"dispersion":0.001,"rim":1.5,"rimWidth":1.4}'>
+  <ag-glass class="music-player" id="music-player" variant="lens" tone="dark" params='{"blur":0.8,"zoom":1.35,"bezel":0.2,"maxBezel":34,"depth":1.98,"dispersion":0.001,"rim":0.45,"rimWidth":0.6}'>
     <div class="mp-art-stage" aria-hidden="true"></div>
     <div class="mp-track">
       <img id="mp-cover" src="assets/logo.png" alt="">
@@ -244,18 +244,18 @@
       <span class="mp-tool-separator" aria-hidden="true"></span>
       <button id="mp-queue" type="button" aria-label="Open queue" aria-expanded="false"></button>
     </div>
-    <div class="mp-queue-popup" id="mp-queue-popup" aria-hidden="true">
+    <ag-glass class="mp-queue-popup" id="mp-queue-popup" aria-hidden="true" variant="lens" tone="dark" params='{"blur":2,"zoom":1.25,"bezel":0.16,"maxBezel":24,"depth":0.85,"dispersion":0.004,"rim":0.55,"rimWidth":0.6}'>
       <div class="mp-queue-head"><strong>Queue</strong><span id="mp-queue-count">0 tracks</span></div>
       <div class="mp-queue-list" id="mp-queue-list"></div>
-    </div>
+    </ag-glass>
     <audio id="mp-audio" preload="auto" playsinline></audio>
   </ag-glass>
 
-  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=58"></script>
-  <script src="assets/config.js?v=58"></script>
-  <script src="assets/home.js?v=58"></script>
-  <script src="assets/profile.js?v=58"></script>
-  <script src="assets/music.js?v=58"></script>
-  <script src="assets/intro.js?v=58"></script>
+  <script type="module" src="assets/vendor/amazing-glass/amazing-glass.min.js?v=59"></script>
+  <script src="assets/config.js?v=59"></script>
+  <script src="assets/home.js?v=59"></script>
+  <script src="assets/profile.js?v=59"></script>
+  <script src="assets/music.js?v=59"></script>
+  <script src="assets/intro.js?v=59"></script>
 </body>
 </html>
