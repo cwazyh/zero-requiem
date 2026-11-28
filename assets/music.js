@@ -818,6 +818,10 @@ function syncArtSpan() {
   player.classList.toggle("art-expanded", open && queueHeight > 0);
 }
 
+if (typeof ResizeObserver !== "undefined" && queuePopup) {
+  new ResizeObserver(() => syncArtSpan()).observe(queuePopup);
+}
+
 function openQueuePopup(force = false) {
   clearQueueCloseTimer();
   if (!force) closeVolumePopup(true);
