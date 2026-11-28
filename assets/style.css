@@ -609,7 +609,6 @@ button.brand:hover span { color: #fff; }
 }
 .mp-queue-popup.open { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
 .mp-queue-head, .mp-queue-list { position: relative; z-index: 1; }
-.mp-queue-list, .mp-queue-head { background: var(--ui-panel-scrim, transparent); }
 .mp-queue-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 12px; background: transparent; }
 .mp-queue-head strong { font-size: 14px; font-weight: 650; letter-spacing: 0.01em; }
 .mp-queue-head span { font-size: 11px; color: #949ba4; font-variant-numeric: tabular-nums; white-space: nowrap; }
