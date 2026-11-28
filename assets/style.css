@@ -438,19 +438,8 @@ button.brand:hover span { color: #fff; }
   background-size: 100% 100%;
   background-position: center center;
   filter: blur(24px) saturate(145%);
-  opacity: 0.92;
+  opacity: 1;
 }
-.mp-art-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--ui-veil, rgba(6, 7, 9, 0.22));
-}
-.music-player .mp-meta strong,
-.music-player .mp-queue-copy strong,
-.music-player .mp-queue-duration,
-.music-player .mp-queue-copy span,
-.music-player .mp-queue-head span { text-shadow: var(--ui-text-shadow, 0 1px 2px rgba(0, 0, 0, 0.5)); }
 .music-player.art-ready .mp-art-stage { opacity: 1; }
 .music-player > * { position: relative; z-index: 1; }
 #music-player > .mp-art-stage { position: absolute; z-index: 0; }
