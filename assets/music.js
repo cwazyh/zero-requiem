@@ -813,6 +813,7 @@ function syncArtSpan() {
   const maxQueueHeight = Math.min(468, Math.max(0, window.innerHeight - 108));
   const headroom = 48;
   const open = Boolean(queuePopup && queuePopup.classList.contains("open"));
+  player.classList.toggle("queue-open", open);
   const queueRect = open && queuePopup ? queuePopup.getBoundingClientRect() : null;
   const queueWidth = queueRect ? queueRect.width : 0;
   const queueHeight = queueRect ? queueRect.height : 0;
