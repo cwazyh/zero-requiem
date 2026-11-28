@@ -754,6 +754,11 @@ async function loadTracks() {
     buildQueueList();
     selectTrack(initialTrackIndex(firstVisit), false);
     updateVolumeVisual();
+    syncArtSpan();
+    requestAnimationFrame(() => {
+      syncArtSpan();
+      if (player) player.classList.add("art-ready");
+    });
   } catch (_) {
     if (titleNode) titleNode.textContent = "Soundtrack unavailable";
     if (artistNode) artistNode.textContent = "Track list could not be loaded";
