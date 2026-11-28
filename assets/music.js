@@ -800,17 +800,22 @@ function clearQueueCloseTimer() {
 
 function syncArtSpan() {
   if (!player) return;
-  const barHeight = player.getBoundingClientRect().height || 64;
-  player.style.setProperty("--art-bar-height", `${barHeight}px`);
+  const playerRect = player.getBoundingClientRect();
+  const barHeight = playerRect.height || 64;
   const open = Boolean(queuePopup && queuePopup.classList.contains("open"));
-  if (open) {
-    const queueHeight = queuePopup.getBoundingClientRect().height || 0;
-    player.style.setProperty("--art-span", `${barHeight + queueHeight}px`);
-    player.classList.add("art-expanded");
-  } else {
-    player.style.setProperty("--art-span", `${barHeight}px`);
-    player.classList.remove("art-expanded");
-  }
+  const queueRect = open && queuePopup ? queuePopup.getBoundingClientRect() : null;
+  const queueHeight = queueRect ? queueRect.height : 0;
+  const queueWidth = queueRect ? queueRect.width : 0;
+  const queueX = queueRect ? queueRect.right - playerRect.left - queueWidth : 0;
+  const span = barHeight + queueHeight;
+
+  player.style.setProperty("--art-bar-height", `${barHeight}px`);
+  player.style.setProperty("--art-bar-y", `${span - barHeight}px`);
+  player.style.setProperty("--art-span", `${span}px`);
+  player.style.setProperty("--art-queue-w", `${queueWidth}px`);
+  player.style.setProperty("--art-queue-h", `${queueHeight}px`);
+  player.style.setProperty("--art-queue-x", `${queueX}px`);
+  player.classList.toggle("art-expanded", open && queueHeight > 0);
 }
 
 function openQueuePopup(force = false) {
