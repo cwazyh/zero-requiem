@@ -272,6 +272,39 @@ function channelLuminance(value) {
   return normalised <= 0.04045 ? normalised / 12.92 : Math.pow((normalised + 0.055) / 1.055, 2.4);
 }
 
+let accentSamples = null;
+
+function refreshLocalInk() {
+  if (!accentSamples || !player) return;
+  const stage = player.querySelector(".mp-art-stage");
+  if (!stage) return;
+  const stageRect = stage.getBoundingClientRect();
+  if (!stageRect.width || !stageRect.height) return;
+  const paintedTop = stageRect.top - 104;
+  const paintedHeight = stageRect.height + 112;
+  const targets = [
+    [titleNode, 0.4],
+    [artistNode, 0.6]
+  ];
+  for (const element of player.querySelectorAll(".mp-queue-head span, .mp-queue-copy strong, .mp-queue-copy span, .mp-queue-duration")) {
+    targets.push([element, 0.5]);
+  }
+  for (const [element, yBias] of targets) {
+    if (!element) continue;
+    const rect = element.getBoundingClientRect();
+    if (!rect.width || !rect.height) continue;
+    const cx = (rect.left + rect.width / 2 - stageRect.left) / stageRect.width;
+    const cy = (rect.top + rect.height * yBias - paintedTop) / paintedHeight;
+    const x0 = Math.max(0, cx - 0.04);
+    const x1 = Math.min(1, cx + 0.04);
+    const y0 = Math.max(0, cy - 0.03);
+    const y1 = Math.min(1, cy + 0.03);
+    const ink = inkForBackdrop(...sampleBackdrop(accentSamples, x0, y0, x1, y1));
+    element.style.setProperty("--local-ink", ink.color);
+    element.style.setProperty("--local-ink-soft", ink.soft);
+  }
+}
+
 function applyCoverAccent(image) {
   if (!player || !image) return;
   const source = image.src || image.currentSrc;
@@ -298,6 +331,7 @@ function applyCoverAccent(image) {
     if (!context) return fallback();
     context.drawImage(image, 0, 0, 64, 64);
     const data = context.getImageData(0, 0, 64, 64).data;
+    accentSamples = data;
     const barRegion = sampleBackdrop(data, 0.08, 0.86, 0.34, 0.98);
     const queueRegion = sampleBackdrop(data, 0.62, 0.3, 0.98, 0.94);
     const queueHeadRegion = sampleBackdrop(data, 0.62, 0.04, 0.98, 0.18);
@@ -373,6 +407,7 @@ function applyCoverAccent(image) {
     player.style.setProperty("--mp-accent-end", stops[2]);
     player.style.setProperty("--mp-accent-solid", stops[0]);
     applyMaterialTheme(data, lightArt, { bar: barRegion, queue: queueRegion, head: queueHeadRegion });
+    refreshLocalInk();
   } catch (_) {
     fallback();
   }
@@ -854,6 +889,7 @@ function buildQueueList() {
   queueList.scrollTop = previousScroll;
   updateQueueDurations();
   updateActiveRow();
+  requestAnimationFrame(refreshLocalInk);
 }
 
 async function loadDurations() {
@@ -1000,7 +1036,11 @@ function openQueuePopup(force = false) {
   }
   if (queueButton) queueButton.setAttribute("aria-expanded", "true");
   syncArtSpan();
-  loadDurations().then(syncArtSpan);
+  loadDurations().then(() => {
+    syncArtSpan();
+    refreshLocalInk();
+  });
+  requestAnimationFrame(refreshLocalInk);
 }
 
 function closeQueuePopup(force = false) {
@@ -1224,4 +1264,7 @@ updateVolumeVisual();
 syncArtSpan();
 loadTracks();
 
-window.addEventListener("resize", syncArtSpan);
+window.addEventListener("resize", () => {
+  syncArtSpan();
+  refreshLocalInk();
+});
