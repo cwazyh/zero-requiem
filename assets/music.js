@@ -299,9 +299,10 @@ function refreshLocalInk() {
     const x1 = Math.min(1, cx + 0.04);
     const y0 = Math.max(0, cy - 0.03);
     const y1 = Math.min(1, cy + 0.03);
-    const ink = inkForBackdrop(...sampleBackdrop(accentSamples, x0, y0, x1, y1));
-    element.style.setProperty("--local-ink", ink.color);
-    element.style.setProperty("--local-ink-soft", ink.soft);
+    const [red, green, blue] = sampleBackdrop(accentSamples, x0, y0, x1, y1);
+    const inverted = `rgb(${Math.round(255 - red)}, ${Math.round(255 - green)}, ${Math.round(255 - blue)})`;
+    element.style.setProperty("--local-ink", inverted);
+    element.style.setProperty("--local-ink-soft", inverted.replace("rgb(", "rgba(").replace(")", ", 0.9)"));
   }
 }
 
@@ -843,6 +844,7 @@ function buildQueueList() {
       draggedIndex = null;
       queueDragging = false;
       suppressQueueClickUntil = performance.now() + 250;
+      refreshLocalInk();
     });
     grip.addEventListener("keydown", (event) => {
       const focusGrip = (target) => {
