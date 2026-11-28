@@ -696,20 +696,20 @@ button.brand:hover span { color: #fff; }
 #music-player.light-art .mp-queue-copy span { color: #4b4f56; }
 #music-player.light-art .mp-queue-duration { color: #4b4f56; }
 #music-player .mp-meta strong,
-#music-player.light-art .mp-meta strong { color: var(--bar-ink, #f2f3f5); }
+#music-player.light-art .mp-meta strong { color: var(--local-ink, var(--bar-ink, #f2f3f5)); }
 #music-player .mp-meta span,
-#music-player.light-art .mp-meta span { color: var(--bar-ink-soft, #949ba4); }
+#music-player.light-art .mp-meta span { color: var(--local-ink-soft, var(--bar-ink-soft, #949ba4)); }
 #music-player .mp-queue-popup,
 #music-player.light-art .mp-queue-popup { color: var(--queue-ink, #dbdee1); }
 #music-player .mp-queue-copy strong,
 #music-player.light-art .mp-queue-copy strong,
-#music-player.light-art .mp-queue-row.active .mp-queue-copy strong { color: var(--queue-ink, #f2f3f5); }
+#music-player.light-art .mp-queue-row.active .mp-queue-copy strong { color: var(--local-ink, var(--queue-ink, #f2f3f5)); }
 #music-player .mp-queue-copy span,
 #music-player.light-art .mp-queue-copy span,
 #music-player .mp-queue-duration,
-#music-player.light-art .mp-queue-duration { color: var(--queue-ink-soft, #949ba4); }
+#music-player.light-art .mp-queue-duration { color: var(--local-ink-soft, var(--queue-ink-soft, #949ba4)); }
 #music-player .mp-queue-head span,
-#music-player.light-art .mp-queue-head span { color: var(--queue-head-ink, #949ba4); }
+#music-player.light-art .mp-queue-head span { color: var(--local-ink, var(--queue-head-ink, #949ba4)); }
 .user-popout {
   position: fixed;
   z-index: 80;
