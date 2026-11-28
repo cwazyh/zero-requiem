@@ -412,7 +412,7 @@ button.brand:hover span { color: #fff; }
   z-index: 0;
   height: var(--art-span);
   pointer-events: none;
-  border-radius: 0 0 var(--ag-radius) var(--ag-radius);
+  border-radius: var(--ag-radius);
   overflow: hidden;
   background-color: transparent;
   transform: translateZ(0);
@@ -580,14 +580,6 @@ button.brand:hover span { color: #fff; }
   transition: opacity 0.22s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.3s;
   pointer-events: none;
 }
-#mp-queue-popup.ag-glass {
-  --ag-tint: rgba(12, 14, 16, 0.18);
-  --ag-radius: 16px;
-  --ag-shadow: none;
-  border-radius: 16px 16px 0 0;
-  box-shadow: none;
-}
-#mp-queue-popup.ag-glass > .ag-refract { background-image: none !important; box-shadow: none; }
 .mp-queue-popup.open { opacity: 1; visibility: visible; transform: none; pointer-events: auto; }
 .mp-queue-head, .mp-queue-list { position: relative; z-index: 1; }
 .mp-queue-list { background: transparent; }
