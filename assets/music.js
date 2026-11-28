@@ -801,7 +801,7 @@ function clearQueueCloseTimer() {
 function artQueueMask(width, height) {
   if (!width || !height) return "none";
   const r = Math.min(32, width / 2, height / 2);
-  const path = `M0 ${height - r} L0 ${r} Q0 0 ${r} 0 L${width - r} 0 Q${width} 0 ${width} ${r} L${width} ${height - r} Q${width} ${height} ${width - r} ${height} L${r} ${height} Q0 ${height} 0 ${height - r} Z`;
+  const path = `M ${r} 0 H ${width - r} A ${r} ${r} 0 0 1 ${width} ${r} V ${height - r} A ${r} ${r} 0 0 1 ${width - r} ${height} H ${r} A ${r} ${r} 0 0 1 0 ${height - r} V ${r} A ${r} ${r} 0 0 1 ${r} 0 Z`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><path d="${path}" fill="#fff"/></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
@@ -811,13 +811,15 @@ function syncArtSpan() {
   const playerRect = player.getBoundingClientRect();
   const barHeight = playerRect.height || 64;
   const maxQueueHeight = Math.min(468, Math.max(0, window.innerHeight - 108));
-  const span = barHeight + maxQueueHeight;
+  const headroom = 48;
   const open = Boolean(queuePopup && queuePopup.classList.contains("open"));
   const queueRect = open && queuePopup ? queuePopup.getBoundingClientRect() : null;
-  const queueHeight = queueRect ? queueRect.height : 0;
   const queueWidth = queueRect ? queueRect.width : 0;
-  const queueX = queueRect ? queueRect.right - playerRect.left - queueWidth : 0;
-  const queueY = span - barHeight - queueHeight;
+  const queueHeight = queueRect ? queueRect.height : 0;
+  const span = barHeight + Math.max(maxQueueHeight, queueHeight) + headroom;
+  const stageTop = playerRect.bottom - span;
+  const queueX = queueRect ? queueRect.left - playerRect.left : 0;
+  const queueY = queueRect ? queueRect.top - stageTop : 0;
 
   player.style.setProperty("--art-bar-height", `${barHeight}px`);
   player.style.setProperty("--art-bar-y", `${span - barHeight}px`);
