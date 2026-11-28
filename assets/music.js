@@ -155,12 +155,61 @@ function hslToRgb(h, s, l) {
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
+function inkForBackdrop(r, g, b) {
+  const luminance = 0.2126 * channelLuminance(r) + 0.7152 * channelLuminance(g) + 0.0722 * channelLuminance(b);
+  const whiteContrast = 1.05 / (luminance + 0.05);
+  const blackContrast = (luminance + 0.05) / 0.05;
+  const darkInk = blackContrast >= whiteContrast;
+  const [hue, saturation] = rgbToHsl(r, g, b);
+  const [red, green, blue] = hslToRgb(
+    hue,
+    Math.min(darkInk ? 0.22 : 0.16, saturation * 0.35),
+    darkInk ? 0.09 : 0.94
+  );
+  return {
+    color: `rgb(${red}, ${green}, ${blue})`,
+    soft: `rgba(${red}, ${green}, ${blue}, 0.66)`,
+    shadow: darkInk ? "0 1px 2px rgba(255, 255, 255, 0.85)" : "0 1px 3px rgba(0, 0, 0, 0.8)"
+  };
+}
+
+function sampleBackdrop(data, x0, y0, x1, y1) {
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+  let count = 0;
+  for (let y = Math.floor(y0 * 64); y < Math.ceil(y1 * 64); y += 1) {
+    for (let x = Math.floor(x0 * 64); x < Math.ceil(x1 * 64); x += 1) {
+      const index = (Math.min(63, Math.max(0, y)) * 64 + Math.min(63, Math.max(0, x))) * 4;
+      if (data[index + 3] < 51) continue;
+      red += data[index];
+      green += data[index + 1];
+      blue += data[index + 2];
+      count += 1;
+    }
+  }
+  return count ? [red / count, green / count, blue / count] : [20, 22, 22];
+}
+
+function channelLuminance(value) {
+  const normalised = value / 255;
+  return normalised <= 0.04045 ? normalised / 12.92 : Math.pow((normalised + 0.055) / 1.055, 2.4);
+}
+
 function applyCoverAccent(image) {
   if (!player || !image) return;
   const source = image.src || image.currentSrc;
   if (source) player.style.setProperty("--queue-cover", `url("${source}")`);
   const fallback = () => {
     player.classList.remove("light-art");
+    player.style.setProperty("--ui-veil", "rgba(6, 7, 9, 0.22)");
+    player.style.setProperty("--ui-panel-scrim", "rgba(6, 7, 9, 0.32)");
+    player.style.setProperty("--ui-text-shadow", "0 1px 3px rgba(0, 0, 0, 0.75)");
+    player.style.setProperty("--bar-ink", "rgb(242, 243, 245)");
+    player.style.setProperty("--bar-ink-soft", "rgba(148, 155, 164, 0.95)");
+    player.style.setProperty("--queue-ink", "rgb(242, 243, 245)");
+    player.style.setProperty("--queue-ink-soft", "rgba(148, 155, 164, 0.95)");
+    player.style.setProperty("--queue-head-ink", "rgb(219, 222, 225)");
     player.style.setProperty("--mp-accent-start", "rgb(30, 31, 34)");
     player.style.setProperty("--mp-accent-mid", "rgb(44, 47, 52)");
     player.style.setProperty("--mp-accent-end", "rgb(20, 22, 22)");
@@ -174,6 +223,14 @@ function applyCoverAccent(image) {
     if (!context) return fallback();
     context.drawImage(image, 0, 0, 64, 64);
     const data = context.getImageData(0, 0, 64, 64).data;
+    const barInk = inkForBackdrop(...sampleBackdrop(data, 0.08, 0.86, 0.34, 0.98));
+    const queueInk = inkForBackdrop(...sampleBackdrop(data, 0.62, 0.3, 0.98, 0.94));
+    const queueHeadInk = inkForBackdrop(...sampleBackdrop(data, 0.62, 0.04, 0.98, 0.18));
+    player.style.setProperty("--bar-ink", barInk.color);
+    player.style.setProperty("--bar-ink-soft", barInk.soft);
+    player.style.setProperty("--queue-ink", queueInk.color);
+    player.style.setProperty("--queue-ink-soft", queueInk.soft);
+    player.style.setProperty("--queue-head-ink", queueHeadInk.color);
     const bucketCount = 24;
     const weights = new Array(bucketCount).fill(0);
     const reds = new Array(bucketCount).fill(0);
@@ -181,12 +238,14 @@ function applyCoverAccent(image) {
     const blues = new Array(bucketCount).fill(0);
     let luminanceTotal = 0;
     let luminanceCount = 0;
+    let relativeLuminanceTotal = 0;
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
       const alpha = data[i + 3] / 255;
       luminanceTotal += (0.2126 * r + 0.7152 * g + 0.0722 * b) * alpha;
+      relativeLuminanceTotal += (0.2126 * channelLuminance(r) + 0.7152 * channelLuminance(g) + 0.0722 * channelLuminance(b)) * alpha;
       luminanceCount += alpha;
       const [hue, saturation, lightness] = rgbToHsl(r, g, b);
       if (lightness < 0.1 || lightness > 0.95 || saturation < 0.2) continue;
@@ -218,7 +277,12 @@ function applyCoverAccent(image) {
     }
     if (!picked.length) return fallback();
     const averageLuminance = luminanceCount > 0 ? luminanceTotal / luminanceCount / 255 : 0;
-    player.classList.toggle("light-art", averageLuminance > 0.58);
+    const relativeLuminance = luminanceCount > 0 ? relativeLuminanceTotal / luminanceCount : 0;
+    const lightArt = relativeLuminance > 0.34 || (relativeLuminance > 0.24 && averageLuminance > 0.6);
+    player.classList.toggle("light-art", lightArt);
+    player.style.setProperty("--ui-veil", lightArt ? "rgba(248, 249, 250, 0.16)" : "rgba(6, 7, 9, 0.22)");
+    player.style.setProperty("--ui-panel-scrim", lightArt ? "rgba(248, 249, 250, 0.28)" : "rgba(6, 7, 9, 0.32)");
+    player.style.setProperty("--ui-text-shadow", lightArt ? "0 1px 2px rgba(255, 255, 255, 0.9)" : "0 1px 3px rgba(0, 0, 0, 0.75)");
     picked.sort((first, second) => first.hue - second.hue);
     const stops = picked.map(({ hue, saturation, lightness }) => {
       const safeSaturation = Math.max(0.55, saturation);
