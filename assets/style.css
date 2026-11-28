@@ -430,16 +430,13 @@ button.brand:hover span { color: #fff; }
 .mp-art-stage::before {
   content: "";
   position: absolute;
-  inset: -24px;
+  inset: 0;
   background-color: transparent;
   background-image: var(--queue-cover);
-  background-size: 230% var(--art-bar-height);
-  background-repeat: repeat-y;
-  background-position: calc(var(--mp-progress-scale) * 100%) bottom;
-  filter: blur(44px) saturate(190%);
-  transform: scale(1.15);
-  opacity: 0.62;
-  transition: background-position 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  background-size: 100% 100%;
+  background-position: center center;
+  filter: blur(8px) saturate(150%);
+  opacity: 1;
 }
 .music-player > * { position: relative; z-index: 1; }
 #music-player > .mp-art-stage { position: absolute; z-index: 0; }
