@@ -379,6 +379,10 @@ button.brand:hover span { color: #fff; }
   --mp-progress-scale: 0;
   --art-span: 64px;
   --art-bar-height: 64px;
+  --art-bar-y: 0px;
+  --art-queue-w: 0px;
+  --art-queue-h: 0px;
+  --art-queue-x: 0px;
   --queue-cover: none;
   --queue-width: min(392px, calc(100vw - 36px));
   --queue-right: 18px;
@@ -409,15 +413,14 @@ button.brand:hover span { color: #fff; }
   border-radius: var(--ag-radius);
   overflow: hidden;
   background-color: rgb(8, 9, 11);
-  filter: blur(44px) saturate(190%);
   transform: translateZ(0);
   isolation: isolate;
   -webkit-mask-image: linear-gradient(90deg, #000 0 calc(var(--mp-progress-scale) * 100%), transparent calc(var(--mp-progress-scale) * 100%) 100%), linear-gradient(#000, #000);
   mask-image: linear-gradient(90deg, #000 0 calc(var(--mp-progress-scale) * 100%), transparent calc(var(--mp-progress-scale) * 100%) 100%), linear-gradient(#000, #000);
-  -webkit-mask-size: 100% var(--art-bar-height), var(--queue-width) calc(100% - var(--art-bar-height));
-  mask-size: 100% var(--art-bar-height), var(--queue-width) calc(100% - var(--art-bar-height));
-  -webkit-mask-position: bottom, right var(--queue-right) top;
-  mask-position: bottom, right var(--queue-right) top;
+  -webkit-mask-size: 100% var(--art-bar-height), var(--art-queue-w) var(--art-queue-h);
+  mask-size: 100% var(--art-bar-height), var(--art-queue-w) var(--art-queue-h);
+  -webkit-mask-position: 0 var(--art-bar-y), var(--art-queue-x) 0;
+  mask-position: 0 var(--art-bar-y), var(--art-queue-x) 0;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -428,8 +431,9 @@ button.brand:hover span { color: #fff; }
   inset: -24px;
   background-color: rgb(8, 9, 11);
   background-image: var(--queue-cover);
-  background-size: cover;
+  background-size: 100% 100%;
   background-position: calc(var(--mp-progress-scale) * 100%) center;
+  filter: blur(44px) saturate(190%);
   transform: scale(1.1);
   opacity: 1;
 }
