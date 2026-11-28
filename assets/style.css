@@ -415,8 +415,9 @@ button.brand:hover span { color: #fff; }
   background-color: rgb(8, 9, 11);
   transform: translateZ(0);
   isolation: isolate;
-  -webkit-mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);
-  mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);
+  --art-progress-stop: calc(var(--mp-progress-scale) * 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(var(--art-progress-stop) - 14px), transparent var(--art-progress-stop)), linear-gradient(#000, #000);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(var(--art-progress-stop) - 14px), transparent var(--art-progress-stop)), linear-gradient(#000, #000);
   -webkit-mask-size: 100% var(--art-bar-height), var(--art-queue-w) var(--art-queue-h);
   mask-size: 100% var(--art-bar-height), var(--art-queue-w) var(--art-queue-h);
   -webkit-mask-position: 0 var(--art-bar-y), var(--art-queue-x) 0;
@@ -430,11 +431,12 @@ button.brand:hover span { color: #fff; }
   inset: -24px;
   background-color: rgb(8, 9, 11);
   background-image: var(--queue-cover);
-  background-size: 100% 100%;
-  background-position: center center;
+  background-size: 230% 100%;
+  background-position: calc(var(--mp-progress-scale) * 100%) center;
   filter: blur(44px) saturate(190%);
-  transform: scale(1.1);
+  transform: scale(1.15);
   opacity: 1;
+  transition: background-position 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 #music-player.art-expanded .mp-art-stage { border-radius: 16px 16px var(--ag-radius) var(--ag-radius); }
 .music-player > * { position: relative; z-index: 1; }
@@ -475,19 +477,6 @@ button.brand:hover span { color: #fff; }
 .mp-controls button.primary:active { transform: scale(0.94); }
 .mp-controls button.primary svg { width: 16px; height: 16px; }
 .mp-timeline { position: absolute; inset: 0; z-index: 2; pointer-events: auto; }
-.mp-timeline::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: calc(var(--mp-progress-scale) * 100%);
-  height: 2px;
-  border-radius: 2px;
-  background: #f2f3f5;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
-  transition: width 0.3s linear;
-  pointer-events: none;
-}
 .mp-timeline span { display: none; }
 .mp-seek {
   position: absolute;
