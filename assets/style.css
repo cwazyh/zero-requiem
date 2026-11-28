@@ -440,6 +440,25 @@ button.brand:hover span { color: #fff; }
 }
 .music-player > * { position: relative; z-index: 1; }
 #music-player > .mp-art-stage { position: absolute; z-index: 0; }
+.music-player > .mp-art-cover { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.mp-art-cover::before, .mp-art-cover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  background: var(--bg);
+}
+.mp-art-cover::before {
+  left: 0;
+  -webkit-mask-image: radial-gradient(circle at 100% 100%, transparent 31px, #000 32px);
+  mask-image: radial-gradient(circle at 100% 100%, transparent 31px, #000 32px);
+}
+.mp-art-cover::after {
+  right: 0;
+  -webkit-mask-image: radial-gradient(circle at 0% 100%, transparent 31px, #000 32px);
+  mask-image: radial-gradient(circle at 0% 100%, transparent 31px, #000 32px);
+}
 .music-player > .mp-track, .music-player > .mp-tools, .music-player > .mp-queue-popup { z-index: 3; }
 .music-player button {
   appearance: none;
